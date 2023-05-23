@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/000 - IndigenousGames/007 - Scenes/MainMenu.unity
     guid: a5459b0b83cce3c499f8571be324063c
+  - enabled: 1
+    path: Assets/000 - IndigenousGames/007 - Scenes/AgawanBase.unity
+    guid: a3e8caa950c42324d8d845b462c7f6c1
   m_configObjects: {}

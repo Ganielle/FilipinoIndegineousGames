@@ -53,5 +53,14 @@ public class MainMenuController : MonoBehaviour
 
     }
 
+    public void ChangeGameScene(string stageName)
+    {
+        if (!menuCore.CanInteract) return;
+
+        menuCore.CanInteract = false;
+
+        GameManager.Instance.SceneController.CurrentScene = stageName;
+    }
+
     #endregion
 }

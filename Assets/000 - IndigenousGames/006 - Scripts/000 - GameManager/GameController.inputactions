@@ -1,0 +1,66 @@
+{
+    "name": "GameController",
+    "maps": [
+        {
+            "name": "AgawanBase",
+            "id": "95e89618-0588-4dda-a3b5-cb97f8da5dd2",
+            "actions": [
+                {
+                    "name": "Movement",
+                    "type": "PassThrough",
+                    "id": "813160c0-b97f-4a73-b83c-7614082e8f82",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CameraLook",
+                    "type": "PassThrough",
+                    "id": "20529096-3139-4a8f-9bba-a67c865b8d0c",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d9b808c3-1304-4298-a0f0-e62bef414422",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Android",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "85841f40-661b-40f7-8f26-ce07e2a750d5",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Android",
+                    "action": "CameraLook",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Android",
+            "bindingGroup": "Android",
+            "devices": [
+                {
+                    "devicePath": "<AndroidGamepad>",
+                    "isOptional": true,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}
