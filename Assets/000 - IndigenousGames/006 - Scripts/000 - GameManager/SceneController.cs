@@ -74,6 +74,11 @@ public class SceneController : MonoBehaviour
         }
     }
 
+    public bool DoneLoading
+    {
+        get => doneLoading;
+    }
+
     //  ===========================================
 
     [SerializeField] private List<GameObject> loadingObjs;
@@ -92,8 +97,9 @@ public class SceneController : MonoBehaviour
     [ReadOnly] [SerializeField] private bool actionPass;
     [ReadOnly] [SerializeField] private float totalSceneProgress;
     [ReadOnly] [SerializeField] private bool splashOver;
-    [ReadOnly][SerializeField] private float currentAspectRatio;
-    [ReadOnly][SerializeField] private float orthographicSize;
+    [ReadOnly] [SerializeField] private bool doneLoading;
+    [ReadOnly] [SerializeField] private float currentAspectRatio;
+    [ReadOnly] [SerializeField] private float orthographicSize;
 
     //  ============================================
 
@@ -215,6 +221,8 @@ public class SceneController : MonoBehaviour
         backgroundImage.sprite = backgroundSprites[UnityEngine.Random.Range(0, backgroundSprites.Count)];
         triviaImage.sprite = triviaSprites[UnityEngine.Random.Range(0, triviaSprites.Count)];*/
 
+        doneLoading = false;
+
         Time.timeScale = 0f;
 
         loadingSlider.value = 0f;
@@ -285,6 +293,8 @@ public class SceneController : MonoBehaviour
         LeanTween.alphaCanvas(loadingCG, 0f, speed).setEase(easeType);
 
         yield return new WaitWhile(() => loadingCG.alpha != 0f);
+
+        doneLoading = true;
 
         for (int a = 0; a < loadingObjs.Count; a++)
         {
