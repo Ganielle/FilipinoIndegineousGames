@@ -84,6 +84,13 @@ public class AgawanBaseCOre : MonoBehaviour
     [SerializeField] private TextMeshProUGUI blueScoreTMP;
     [SerializeField] private TextMeshProUGUI redScoreTMP;
 
+    [Header("PAUSE MENU")]
+    [SerializeField] private GameObject pauseMenuObj;
+
+    [Header("FINISH STATUS")]
+    [SerializeField] private TextMeshProUGUI finishStatusTMP;
+    [SerializeField] private GameObject finishStatusObj;
+
     [Header("DEBUGGER")]
     [ReadOnly][SerializeField] private MatchState currentMatchState;
     [ReadOnly][SerializeField] private Team currentTeam;
@@ -167,6 +174,7 @@ public class AgawanBaseCOre : MonoBehaviour
     {
         playerCC.enabled = false;
         playerTF.position = CurrentTeam == Team.BLUE ? blueSpawnPoint.position : redSpawnPoint.position;
+        playerTF.rotation = CurrentTeam == Team.BLUE ? blueSpawnPoint.rotation : redSpawnPoint.rotation;
         playerCC.enabled = true;
     }
 
@@ -193,12 +201,50 @@ public class AgawanBaseCOre : MonoBehaviour
             yield return null;
         }
 
-        yield return null;
+        CurrentMatchState = MatchState.FINISH;
+
+        gameplayPanel.SetActive(false);
+        finishStatusObj.SetActive(true);
+
+
+        if (currentBlueScore == 0 && currentRedScore == 0)
+            finishStatusTMP.text = "THE MATCH IS DRAW!";
+        else
+            finishStatusTMP.text = CurrentTeam == Team.BLUE ? "BLUE TEAM WINS!" : "RED TEAM WINS!";
     }
 
-    public void AddRedTeamScore() => currentRedScore++;
+    public void AddRedTeamScore()
+    {
+        currentRedScore++;
+        redScoreTMP.text = currentRedScore.ToString();
+    }
 
-    public void AddBlueTeamScore() => currentBlueScore++;
+    public void AddBlueTeamScore()
+    {
+        currentBlueScore++;
+        blueScoreTMP.text = currentBlueScore.ToString();
+    }
+
+    #endregion
+
+    #region BUTTON
+
+    public void PauseMenu()
+    {
+        Time.timeScale = 0f;
+        pauseMenuObj.SetActive(true);
+    }
+
+    public void ExitPauseMenu()
+    {
+        Time.timeScale = 1f;
+        pauseMenuObj.SetActive(false);
+    }
+
+    public void ReturnMainMenu()
+    {
+        GameManager.Instance.SceneController.CurrentScene = "MainMenu";
+    }
 
     #endregion
 }

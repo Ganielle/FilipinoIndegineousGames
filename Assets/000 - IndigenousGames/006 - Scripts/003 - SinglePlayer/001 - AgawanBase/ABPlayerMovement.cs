@@ -8,6 +8,8 @@ public class ABPlayerMovement : MonoBehaviour
     [SerializeField] private AgawanBaseCOre core;
     [SerializeField] private Rigidbody playerRB;
     [SerializeField] private CharacterController characterController;
+    [SerializeField] private AgawanBaseKeeperBoundry redKeeperBoundry;
+    [SerializeField] private AgawanBaseKeeperBoundry blueKeeperBoundry;
 
     [Header("MOVEMENT")]
     [SerializeField] private float speed;
@@ -16,8 +18,11 @@ public class ABPlayerMovement : MonoBehaviour
     [SerializeField] private AgawanBaseGameController controller;
 
     [Header("DEBUGGER")]
+    [ReadOnly][SerializeField] private string gatekeeperEnemyName;
     [ReadOnly][SerializeField] private Vector2 movement;
     [ReadOnly][SerializeField] private Vector3 move;
+
+    //  =====================================
 
     private void OnTriggerEnter(Collider other)
     {
@@ -32,9 +37,36 @@ public class ABPlayerMovement : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("AI") && collision.gameObject.name == gatekeeperEnemyName)
+        {
+            if (gatekeeperEnemyName == "RedGatekeeper")
+                redKeeperBoundry.enemiesList.Remove(transform);
+            else
+                blueKeeperBoundry.enemiesList.Remove(transform);
+
+            core.BrinPlayerToSpawnPoint();
+        }
+    }
+
+    //  =====================================
+
+    private void Awake()
+    {
+        StartCoroutine(SelectEnemyGatekeeper());
+    }
+
     private void Update()
     {
         MovePlayer();
+    }
+
+    IEnumerator SelectEnemyGatekeeper()
+    {
+        while (core.CurrentTeam == AgawanBaseCOre.Team.NONE) yield return null;
+
+        gatekeeperEnemyName = core.CurrentTeam == AgawanBaseCOre.Team.BLUE ? "RedGatekeeper" : "BlueGatekeeper";
     }
 
     private void MovePlayer()
