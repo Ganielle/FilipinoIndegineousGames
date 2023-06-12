@@ -62,6 +62,12 @@ public class AgawanBaseCOre : MonoBehaviour
         }
     }
 
+    public int CurrentCollectedCoin
+    {
+        get => currentCollectedCoin;
+        set => currentCollectedCoin = value;
+    }
+
     //  ================================================
 
     [SerializeField] private CharacterController playerCC;
@@ -84,11 +90,15 @@ public class AgawanBaseCOre : MonoBehaviour
     [SerializeField] private TextMeshProUGUI blueScoreTMP;
     [SerializeField] private TextMeshProUGUI redScoreTMP;
 
+    [Header("COINS")]
+    [SerializeField] private TextMeshProUGUI currentCoinTMP;
+
     [Header("PAUSE MENU")]
     [SerializeField] private GameObject pauseMenuObj;
 
     [Header("FINISH STATUS")]
     [SerializeField] private TextMeshProUGUI finishStatusTMP;
+    [SerializeField] private TextMeshProUGUI earningStatusTMP;
     [SerializeField] private GameObject finishStatusObj;
 
     [Header("DEBUGGER")]
@@ -96,6 +106,7 @@ public class AgawanBaseCOre : MonoBehaviour
     [ReadOnly][SerializeField] private Team currentTeam;
     [ReadOnly][SerializeField] private int currentRedScore;
     [ReadOnly][SerializeField] private int currentBlueScore;
+    [ReadOnly][SerializeField] private int currentCollectedCoin;
 
     //  ================================================
 
@@ -106,6 +117,7 @@ public class AgawanBaseCOre : MonoBehaviour
 
     private void Awake()
     {
+        currentCoinTMP.text = "0";
     }
 
     private void OnDisable()
@@ -211,6 +223,8 @@ public class AgawanBaseCOre : MonoBehaviour
             finishStatusTMP.text = "THE MATCH IS DRAW!";
         else
             finishStatusTMP.text = CurrentTeam == Team.BLUE ? "BLUE TEAM WINS!" : "RED TEAM WINS!";
+
+        earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
     }
 
     public void AddRedTeamScore()
@@ -224,6 +238,8 @@ public class AgawanBaseCOre : MonoBehaviour
         currentBlueScore++;
         blueScoreTMP.text = currentBlueScore.ToString();
     }
+
+    public void ChangeCurrentCoin() => currentCoinTMP.text = currentCollectedCoin.ToString("n0");
 
     #endregion
 

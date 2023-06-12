@@ -35,6 +35,16 @@ public class ABPlayerMovement : MonoBehaviour
 
             core.BrinPlayerToSpawnPoint();
         }
+
+        if (other.gameObject.CompareTag("Coin"))
+        {
+            other.GetComponent<CoinController>().AddCoin();
+        }
+
+        if (other.gameObject.CompareTag("Powerup"))
+        {
+            other.GetComponent<PowerupController>().StartPowerup();
+        }
     }
 
     private void OnCollisionEnter(Collision collision)

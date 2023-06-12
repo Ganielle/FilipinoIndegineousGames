@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Flag
   - AI
+  - Coin
+  - Powerup
   layers:
   - Default
   - TransparentFX
