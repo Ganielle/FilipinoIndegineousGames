@@ -62,5 +62,10 @@ public class MainMenuController : MonoBehaviour
         GameManager.Instance.SceneController.CurrentScene = stageName;
     }
 
+    public void ComingSoon()
+    {
+        GameManager.Instance.ErrorControl.ShowError("FEATURE COMING SOON!", null);
+    }
+
     #endregion
 }

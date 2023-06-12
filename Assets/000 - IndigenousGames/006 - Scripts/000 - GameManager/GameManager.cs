@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 
     [field: Header("MISCELLANEOUS SCRIPTS")]
     [field: SerializeField] public SceneController SceneController { get; set; }
+    [field: SerializeField] public ErrorController ErrorControl { get; set; }
 
     //  ==========================================
 
