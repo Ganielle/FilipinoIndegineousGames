@@ -8,6 +8,11 @@ TagManager:
   - AI
   - Coin
   - Powerup
+  - wall
+  - ground
+  - success
+  - enemyjump
+  - finishline
   layers:
   - Default
   - TransparentFX
