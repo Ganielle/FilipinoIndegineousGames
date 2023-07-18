@@ -9,6 +9,7 @@ public class AIAgawanBaseController : MonoBehaviour
 {
     [SerializeField] private AgawanBaseCOre core;
     [SerializeField] private AgawanBaseCOre.Team team;
+    [SerializeField] private Animator playerAnim;
 
     [Header("ARTIFICIAL INTELIGENCE")]
     [SerializeField] private NavMeshAgent aiNavMesh;
@@ -91,12 +92,16 @@ public class AIAgawanBaseController : MonoBehaviour
     {
         if (core.CurrentMatchState != AgawanBaseCOre.MatchState.PLAY)
         {
+            playerAnim.SetBool("idle", true);
+            playerAnim.SetBool("run", false);
             aiNavMesh.isStopped = true;
             return;
         }
 
         aiNavMesh.isStopped = false;
 
+        playerAnim.SetBool("run", true);
+        playerAnim.SetBool("idle", false);
 
         if (aiNavMesh.remainingDistance <= aiNavMesh.stoppingDistance && flagDecision > 40)
         {
