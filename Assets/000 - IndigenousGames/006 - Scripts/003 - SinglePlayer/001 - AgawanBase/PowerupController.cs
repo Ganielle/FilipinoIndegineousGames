@@ -9,14 +9,14 @@ using UnityEngine.UI;
 public class PowerupController : MonoBehaviour
 {
     [SerializeField] private AgawanBaseCOre core;
+    [SerializeField] private QuestionCore questionCore;
+    [SerializeField] private ABPlayerMovement playerMovement;
     [SerializeField] private GameObject powerupParentUIObj;
 
     [Header("POWERUP")]
+    [SerializeField] private float respawnTimer;
     [SerializeField] private Collider powerupCollider;
     [SerializeField] private MeshRenderer powerupRenderer;
-
-    [Header("QUESTIONS")]
-    [SerializeField] private GameObject questionsParentUIObj;
 
     [Header("SPIN THE WHEEL")]
     [SerializeField] private GameObject wheelParentUIObj;
@@ -44,7 +44,7 @@ public class PowerupController : MonoBehaviour
     //  ===================================
 
     Coroutine spinTheWheel;
-    Coroutine respawnTimer;
+    Coroutine currentRespawnTimer;
 
     //  ===================================
 
@@ -79,12 +79,19 @@ public class PowerupController : MonoBehaviour
         powerupCollider.enabled = false;
         powerupRenderer.enabled = false;
 
-        //  INSERT QUESTIONS MUNA DITO SA NGAYON IS SPIN THE WHEEL NA MUNA
+        StartCoroutine(questionCore.SetQuestions(() =>
+        {
+            spinWheelBtn.onClick.AddListener(() => RotateWheelButton());
 
-        spinWheelBtn.onClick.AddListener(() => RotateWheelButton());
+            wheelParentUIObj.SetActive(true);
+            spinWheelBtnObj.SetActive(true);
+            powerupParentUIObj.SetActive(true);
+        }, () =>
+        {
+            powerupParentUIObj.SetActive(false);
+            currentRespawnTimer = StartCoroutine(Respawn());
+        }));
 
-        wheelParentUIObj.SetActive(true);
-        spinWheelBtnObj.SetActive(true);
         powerupParentUIObj.SetActive(true);
     }
 
@@ -107,17 +114,27 @@ public class PowerupController : MonoBehaviour
             wheelTF.eulerAngles = new Vector3(0, 0, currentAngle + startAngle - currentOffset);
         }
 
+        if (selectedIndex == 1)
+        {
+            core.CurrentCollectedCoin += 10;
+            core.ChangeCurrentCoin();
+        }
+        else if (selectedIndex == 2)
+        {
+            StartCoroutine(playerMovement.SpeedBoost());
+        }
+
         yield return new WaitForSecondsRealtime(1f);
 
         powerupParentUIObj.SetActive(false);
         wheelParentUIObj.SetActive(false);
 
-        respawnTimer = StartCoroutine(Respawn());
+        currentRespawnTimer = StartCoroutine(Respawn());
     }
 
     IEnumerator Respawn()
     {
-        float currentRespawnTime = 20f;
+        float currentRespawnTime = respawnTimer;
 
         while (currentRespawnTime > 0)
         {

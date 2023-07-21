@@ -21,6 +21,7 @@ public class ABPlayerMovement : MonoBehaviour
     [ReadOnly][SerializeField] private string gatekeeperEnemyName;
     [ReadOnly][SerializeField] private Vector2 movement;
     [ReadOnly][SerializeField] private Vector3 move;
+    [ReadOnly][SerializeField] private float currentSpeed;
 
     //  =====================================
 
@@ -65,6 +66,7 @@ public class ABPlayerMovement : MonoBehaviour
     private void Awake()
     {
         StartCoroutine(SelectEnemyGatekeeper());
+        currentSpeed = speed;
     }
 
     private void Update()
@@ -77,6 +79,21 @@ public class ABPlayerMovement : MonoBehaviour
         while (core.CurrentTeam == AgawanBaseCOre.Team.NONE) yield return null;
 
         gatekeeperEnemyName = core.CurrentTeam == AgawanBaseCOre.Team.BLUE ? "RedGatekeeper" : "BlueGatekeeper";
+    }
+
+    public IEnumerator SpeedBoost()
+    {
+        currentSpeed = speed + 10;
+
+        float currentTime = 5f;
+
+        while(currentSpeed > 0)
+        {
+            currentTime -= Time.deltaTime;
+            yield return null;
+        }
+
+        currentSpeed = speed;
     }
 
     private void MovePlayer()

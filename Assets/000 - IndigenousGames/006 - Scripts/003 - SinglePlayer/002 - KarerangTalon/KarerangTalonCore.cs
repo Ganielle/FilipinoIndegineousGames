@@ -61,6 +61,8 @@ public class KarerangTalonCore : MonoBehaviour
     [SerializeField] private GameObject gameplayPanel;
     [SerializeField] private GameObject jumpBtnGO;
     [SerializeField] private TextMeshProUGUI timerTMP;
+    [SerializeField] private GameObject playerTurnNowObj;
+    [SerializeField] private GameObject AITurnNowObj;
 
     [Header("JUMP")]
     [SerializeField] private float speedMoveGauge;
@@ -164,6 +166,11 @@ public class KarerangTalonCore : MonoBehaviour
     {
         while (!GameManager.Instance.SceneController.DoneLoading) yield return null;
 
+        if (isPlayerTurn)
+            playerTurnNowObj.SetActive(true);
+        else
+            AITurnNowObj.SetActive(true);
+
         CurrentGameStateKT = GameStateKT.COUNTDOWN;
 
         float time = 3f;
@@ -188,6 +195,11 @@ public class KarerangTalonCore : MonoBehaviour
         gameplayPanel.SetActive(true);
 
         yield return new WaitForSecondsRealtime(1f);
+
+        if (isPlayerTurn)
+            playerTurnNowObj.SetActive(false);
+        else
+            AITurnNowObj.SetActive(false);
 
         CurrentGameStateKT = GameStateKT.GAME;
 
