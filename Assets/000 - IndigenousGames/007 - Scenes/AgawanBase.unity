@@ -1773,6 +1773,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 354990677}
   team: 2
+  boundry: {fileID: 1633481402}
   playerAnim: {fileID: 1399270248}
   aiNavMesh: {fileID: 109678728}
   blueFlagTF: {fileID: 8290860906163706877}
@@ -1795,6 +1796,9 @@ MonoBehaviour:
   waypointIndex: 0
   flagDecision: 0
   selectedWaypoint: {fileID: 0}
+  teamName: 
+  isTagged: 0
+  isRescue: 0
 --- !u!23 &109678730
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4678,6 +4682,8 @@ MonoBehaviour:
   currentRedScore: 0
   currentBlueScore: 0
   currentCollectedCoin: 0
+  taggedBlueList: []
+  taggedRedList: []
 --- !u!114 &354990678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8525,6 +8531,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 354990677}
   team: 1
+  boundry: {fileID: 1159403810}
   playerAnim: {fileID: 1246174468}
   aiNavMesh: {fileID: 681161716}
   blueFlagTF: {fileID: 8290860906163706877}
@@ -8547,6 +8554,9 @@ MonoBehaviour:
   waypointIndex: 0
   flagDecision: 0
   selectedWaypoint: {fileID: 0}
+  teamName: 
+  isTagged: 0
+  isRescue: 0
 --- !u!23 &681161718
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -9093,6 +9103,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 354990677}
   team: 1
+  boundry: {fileID: 1159403810}
   playerAnim: {fileID: 446282423}
   aiNavMesh: {fileID: 778494248}
   blueFlagTF: {fileID: 8290860906163706877}
@@ -9115,6 +9126,9 @@ MonoBehaviour:
   waypointIndex: 0
   flagDecision: 0
   selectedWaypoint: {fileID: 0}
+  teamName: 
+  isTagged: 0
+  isRescue: 0
 --- !u!23 &778494250
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -12414,6 +12428,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 354990677}
   team: 1
+  boundry: {fileID: 1159403810}
   playerAnim: {fileID: 1725882168}
   aiNavMesh: {fileID: 1041854236}
   blueFlagTF: {fileID: 8290860906163706877}
@@ -12436,6 +12451,9 @@ MonoBehaviour:
   waypointIndex: 0
   flagDecision: 0
   selectedWaypoint: {fileID: 0}
+  teamName: 
+  isTagged: 0
+  isRescue: 0
 --- !u!4 &1041854241
 Transform:
   m_ObjectHideFlags: 0
@@ -14015,6 +14033,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 354990677}
   team: 2
+  boundry: {fileID: 1633481402}
   playerAnim: {fileID: 1289423698}
   aiNavMesh: {fileID: 1146094566}
   blueFlagTF: {fileID: 8290860906163706877}
@@ -14037,6 +14056,9 @@ MonoBehaviour:
   waypointIndex: 0
   flagDecision: 0
   selectedWaypoint: {fileID: 0}
+  teamName: 
+  isTagged: 0
+  isRescue: 0
 --- !u!23 &1146094568
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -20965,6 +20987,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 354990677}
   team: 2
+  boundry: {fileID: 1633481402}
   playerAnim: {fileID: 30115694}
   aiNavMesh: {fileID: 1589417798}
   blueFlagTF: {fileID: 8290860906163706877}
@@ -20987,6 +21010,9 @@ MonoBehaviour:
   waypointIndex: 0
   flagDecision: 0
   selectedWaypoint: {fileID: 0}
+  teamName: 
+  isTagged: 0
+  isRescue: 0
 --- !u!23 &1589417800
 MeshRenderer:
   m_ObjectHideFlags: 0

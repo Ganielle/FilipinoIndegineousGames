@@ -43,4 +43,17 @@ public class AgawanBaseKeeperBoundry : MonoBehaviour
 
         isPlayerEnemy = core.CurrentTeam == currentTeam ? false : true;
     }
+
+    public void RemovePlayerInBoundary(Transform objTF)
+    {
+        if (enemiesList.Contains(objTF))
+            enemiesList.Remove(objTF);
+    }
+
+    public void AddPlayerInBoundary(Transform objTF)
+    {
+        if (enemiesList.Contains(objTF)) return;
+
+        enemiesList.Add(objTF);
+    }
 }

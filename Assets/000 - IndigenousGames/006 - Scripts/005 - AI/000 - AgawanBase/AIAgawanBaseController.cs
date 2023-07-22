@@ -1,4 +1,5 @@
 using MyBox;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class AIAgawanBaseController : MonoBehaviour
 {
     [SerializeField] private AgawanBaseCOre core;
     [SerializeField] private AgawanBaseCOre.Team team;
+    [SerializeField] private AgawanBaseKeeperBoundry boundry;
     [SerializeField] private Animator playerAnim;
 
     [Header("ARTIFICIAL INTELIGENCE")]
@@ -24,6 +26,10 @@ public class AIAgawanBaseController : MonoBehaviour
     [ReadOnly][SerializeField] private int waypointIndex;
     [ReadOnly][SerializeField] private int flagDecision;
     [ReadOnly][SerializeField] private Transform selectedWaypoint;
+    [ReadOnly][SerializeField] private string teamName;
+    [ReadOnly][SerializeField] private bool isPlayerTeammate;
+    [ReadOnly] public bool isTagged;
+    [ReadOnly][SerializeField] private bool isRescue;
 
     //  =====================================
 
@@ -31,19 +37,64 @@ public class AIAgawanBaseController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("AI") && collision.gameObject.name == gatekeeperName)
         {
-            aiNavMesh.isStopped = true;
-            aiNavMesh.enabled = false;
+            //aiNavMesh.isStopped = true;
+            //aiNavMesh.enabled = false;
 
-            transform.position = team == AgawanBaseCOre.Team.BLUE ? blueSpawnPoint.position : redSpawnPoint.position;
+            //transform.position = team == AgawanBaseCOre.Team.BLUE ? blueSpawnPoint.position : redSpawnPoint.position;
 
-            waypointIndex = Random.Range(0, waypoints.Count);
+            //waypointIndex = Random.Range(0, waypoints.Count);
+            //selectedWaypoint = waypoints[waypointIndex];
+
+            //flagDecision = 100;
+
+            //aiNavMesh.enabled = true;
+
+            boundry.RemovePlayerInBoundary(gameObject.transform);
+
+            if (teamName == "Blue") core.AddBlueTaggedCharacters(gameObject);
+            else core.AddRedTaggedCharacters(gameObject);
+
+            isTagged = true;
+
+            aiNavMesh.isStopped = false;
+        }
+
+        if (collision.gameObject.CompareTag("AI") && collision.gameObject.name == teamName && isTagged)
+        {
+            waypointIndex = UnityEngine.Random.Range(0, waypoints.Count);
             selectedWaypoint = waypoints[waypointIndex];
 
             flagDecision = 100;
 
+            isTagged = false;
+
             aiNavMesh.enabled = true;
 
-            aiNavMesh.isStopped = false;
+            if (teamName == "Blue")
+                core.taggedBlueList.Remove(gameObject);
+            else
+                core.taggedRedList.Remove(gameObject);
+
+            boundry.AddPlayerInBoundary(transform);
+        }
+
+        if (isPlayerTeammate && collision.gameObject.CompareTag("Player") && isTagged)
+        {
+            waypointIndex = UnityEngine.Random.Range(0, waypoints.Count);
+            selectedWaypoint = waypoints[waypointIndex];
+
+            flagDecision = 100;
+
+            isTagged = false;
+
+            aiNavMesh.enabled = true;
+
+            if (teamName == "Blue")
+                core.taggedBlueList.Remove(gameObject);
+            else
+                core.taggedRedList.Remove(gameObject);
+
+            boundry.AddPlayerInBoundary(transform);
         }
     }
 
@@ -62,7 +113,7 @@ public class AIAgawanBaseController : MonoBehaviour
 
             transform.position = team == AgawanBaseCOre.Team.BLUE ? blueSpawnPoint.position : redSpawnPoint.position;
 
-            waypointIndex = Random.Range(0, waypoints.Count);
+            waypointIndex = UnityEngine.Random.Range(0, waypoints.Count);
             selectedWaypoint = waypoints[waypointIndex];
 
 
@@ -79,12 +130,14 @@ public class AIAgawanBaseController : MonoBehaviour
     private void Awake()
     {
         gatekeeperName = team == Team.BLUE ? "RedGatekeeper" : "BlueGatekeeper";
+        teamName = team == Team.BLUE ? "Blue" : "Red";
         flagDecision = 100;
     }
 
 
     private void Update()
     {
+        isPlayerTeammate = team == core.CurrentTeam ? true : false;
         RunTowardsWaypoint();
     }
 
@@ -98,22 +151,79 @@ public class AIAgawanBaseController : MonoBehaviour
             return;
         }
 
+        if (isTagged)
+        {
+            playerAnim.SetBool("idle", true);
+            playerAnim.SetBool("run", false);
+            aiNavMesh.isStopped = true;
+            return;
+        }
+
         aiNavMesh.isStopped = false;
 
         playerAnim.SetBool("run", true);
         playerAnim.SetBool("idle", false);
 
-        if (aiNavMesh.remainingDistance <= aiNavMesh.stoppingDistance && flagDecision > 40)
+        if (aiNavMesh.remainingDistance <= aiNavMesh.stoppingDistance)
         {
-            flagDecision = Random.Range(0, 100);
+            flagDecision = UnityEngine.Random.Range(0, 100);
 
-            waypointIndex = Random.Range(0, waypoints.Count);
+            waypointIndex = UnityEngine.Random.Range(0, waypoints.Count);
 
+            if (team == Team.BLUE)
+            {
+                if (core.taggedBlueList.Count > 0)
+                {
+                    float random = UnityEngine.Random.Range(0, 101);
 
-            if (flagDecision <= 40)
-                selectedWaypoint = team == AgawanBaseCOre.Team.BLUE ? redFlagTF : blueFlagTF;
+                    if (random > 65)
+                    {
+                        isRescue = true;
+                        selectedWaypoint = core.taggedBlueList[0].transform;
+                    }
+                    else
+                    {
+                        if (flagDecision <= 25)
+                            selectedWaypoint = team == AgawanBaseCOre.Team.BLUE ? redFlagTF : blueFlagTF;
+                        else
+                            selectedWaypoint = waypoints[waypointIndex];
+                    }
+                }
+                else
+                {
+                    if (flagDecision <= 25)
+                        selectedWaypoint = team == AgawanBaseCOre.Team.BLUE ? redFlagTF : blueFlagTF;
+                    else
+                        selectedWaypoint = waypoints[waypointIndex];
+                }
+            }
             else
-                selectedWaypoint = waypoints[waypointIndex];
+            {
+                if (core.taggedRedList.Count > 0)
+                {
+                    float random = UnityEngine.Random.Range(0, 101);
+
+                    if (random > 65)
+                    {
+                        isRescue = true;
+                        selectedWaypoint = core.taggedRedList[0].transform;
+                    }
+                    else
+                    {
+                        if (flagDecision <= 25)
+                            selectedWaypoint = team == AgawanBaseCOre.Team.BLUE ? redFlagTF : blueFlagTF;
+                        else
+                            selectedWaypoint = waypoints[waypointIndex];
+                    }
+                }
+                else
+                {
+                    if (flagDecision <= 25)
+                        selectedWaypoint = team == AgawanBaseCOre.Team.BLUE ? redFlagTF : blueFlagTF;
+                    else
+                        selectedWaypoint = waypoints[waypointIndex];
+                }
+            }
 
             aiNavMesh.SetDestination(selectedWaypoint.position);
         }

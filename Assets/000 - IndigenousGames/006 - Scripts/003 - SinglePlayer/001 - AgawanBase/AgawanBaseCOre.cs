@@ -68,6 +68,27 @@ public class AgawanBaseCOre : MonoBehaviour
         set => currentCollectedCoin = value;
     }
 
+    private event EventHandler TaggedCharacters;
+    public event EventHandler OnTaggedCharacters
+    {
+        add
+        {
+            if (TaggedCharacters == null || !TaggedCharacters.GetInvocationList().Contains(value))
+                TaggedCharacters += value;
+        }
+        remove { TaggedCharacters -= value; }
+    }
+    public void AddBlueTaggedCharacters(GameObject obj)
+    {
+        taggedBlueList.Add(obj);
+        TaggedCharacters?.Invoke(this, EventArgs.Empty);
+    }
+    public void AddRedTaggedCharacters(GameObject obj)
+    {
+        taggedRedList.Add(obj);
+        TaggedCharacters?.Invoke(this, EventArgs.Empty);
+    }
+
     //  ================================================
 
     [SerializeField] private CharacterController playerCC;
@@ -107,6 +128,8 @@ public class AgawanBaseCOre : MonoBehaviour
     [ReadOnly][SerializeField] private int currentRedScore;
     [ReadOnly][SerializeField] private int currentBlueScore;
     [ReadOnly][SerializeField] private int currentCollectedCoin;
+    [ReadOnly][SerializeField] public List<GameObject> taggedBlueList;
+    [ReadOnly][SerializeField] public List<GameObject> taggedRedList;
 
     //  ================================================
 
@@ -118,6 +141,8 @@ public class AgawanBaseCOre : MonoBehaviour
     private void Awake()
     {
         currentCoinTMP.text = "0";
+
+        OnTaggedCharacters += CheckTaggedPlayers;
     }
 
     private void OnDisable()
@@ -125,6 +150,8 @@ public class AgawanBaseCOre : MonoBehaviour
         if (countdownStart != null) StopCoroutine(countdownStart);
 
         if (timerStart != null) StopCoroutine(timerStart);
+
+        OnTaggedCharacters -= CheckTaggedPlayers;
     }
 
     #region INITIALIZER
@@ -181,6 +208,56 @@ public class AgawanBaseCOre : MonoBehaviour
     #endregion
 
     #region GAMEPLAY
+
+    private void CheckTaggedPlayers(object sender, EventArgs e)
+    {
+        if (CurrentTeam == Team.BLUE)
+        {
+            if (taggedBlueList.Count >= 5)
+            {
+                CurrentMatchState = MatchState.FINISH;
+                gameplayPanel.SetActive(false);
+                finishStatusObj.SetActive(true);
+
+                finishStatusTMP.text = "RED TEAM WINS!";
+
+                earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+            }
+            else if (taggedRedList.Count >= 4)
+            {
+                CurrentMatchState = MatchState.FINISH;
+                gameplayPanel.SetActive(false);
+                finishStatusObj.SetActive(true);
+
+                finishStatusTMP.text = "BLUE TEAM WINS!";
+
+                earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+            }
+        }
+        else
+        {
+            if (taggedRedList.Count >= 5)
+            {
+                CurrentMatchState = MatchState.FINISH;
+                gameplayPanel.SetActive(false);
+                finishStatusObj.SetActive(true);
+
+                finishStatusTMP.text = "BLUE TEAM WINS!";
+
+                earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+            }
+            else if (taggedBlueList.Count >= 4)
+            {
+                CurrentMatchState = MatchState.FINISH;
+                gameplayPanel.SetActive(false);
+                finishStatusObj.SetActive(true);
+
+                finishStatusTMP.text = "RED TEAM WINS!";
+
+                earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+            }
+        }
+    }
 
     public void BrinPlayerToSpawnPoint()
     {

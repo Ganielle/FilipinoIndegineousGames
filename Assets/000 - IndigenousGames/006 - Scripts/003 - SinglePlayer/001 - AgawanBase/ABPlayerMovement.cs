@@ -22,6 +22,8 @@ public class ABPlayerMovement : MonoBehaviour
     [ReadOnly][SerializeField] private Vector2 movement;
     [ReadOnly][SerializeField] private Vector3 move;
     [ReadOnly][SerializeField] private float currentSpeed;
+    [ReadOnly][SerializeField] private bool isTagged;
+    [ReadOnly][SerializeField] private string teamName;
 
     //  =====================================
 
@@ -57,7 +59,42 @@ public class ABPlayerMovement : MonoBehaviour
             else
                 blueKeeperBoundry.enemiesList.Remove(transform);
 
-            core.BrinPlayerToSpawnPoint();
+            //core.BrinPlayerToSpawnPoint();
+
+            isTagged = true;
+
+            if (core.CurrentTeam == AgawanBaseCOre.Team.BLUE)
+                core.AddBlueTaggedCharacters(gameObject);
+            else
+                core.AddRedTaggedCharacters(gameObject);
+        }
+
+        if (collision.gameObject.CompareTag("AI") && collision.gameObject.name == teamName)
+        {
+
+            isTagged = false;
+
+            Debug.Log("hello");
+
+            if (gatekeeperEnemyName == "RedGatekeeper")
+            {
+                core.taggedBlueList.Remove(gameObject);
+            }
+            else
+            {
+                core.taggedBlueList.Remove(gameObject);
+            }
+
+            //core.BrinPlayerToSpawnPoint();
+
+            if (gatekeeperEnemyName == "RedGatekeeper")
+            {
+                redKeeperBoundry.AddPlayerInBoundary(transform);
+            }
+            else
+            {
+                blueKeeperBoundry.AddPlayerInBoundary(transform);
+            }
         }
     }
 
@@ -72,6 +109,9 @@ public class ABPlayerMovement : MonoBehaviour
     private void Update()
     {
         MovePlayer();
+
+        if (core.CurrentTeam == AgawanBaseCOre.Team.BLUE) teamName = "Blue";
+        else teamName = "Red";
     }
 
     IEnumerator SelectEnemyGatekeeper()
@@ -98,6 +138,12 @@ public class ABPlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
+        if (isTagged)
+        {
+            characterController.Move(Vector3.zero);
+            return;
+        }
+
         movement = controller.GetPlayerMovement();
         move = new Vector3(movement.x, 0f, movement.y);
         move = GameManager.Instance.MainCamera.transform.forward * move.z +
