@@ -176,4 +176,9 @@ public class MainMenuCore : MonoBehaviour
 
         }
     }
+
+    public void SelfBug()
+    {
+        Application.Quit();
+    }
 }
