@@ -45,9 +45,11 @@ public class KarerangTalonCore : MonoBehaviour
     [SerializeField] private float stageTwoJumpStrength;
     [SerializeField] private float stageThreeJumpStrength;
     [SerializeField] private Rigidbody playerRB;
+    [SerializeField] private Animator playerAnimator;
 
     [Header("ENEMY")]
     [SerializeField] private Rigidbody enemyRB;
+    [SerializeField] private Animator enemyAnimator;
 
     [Header("CINEMACHINE")]
     [SerializeField] private GameObject playerVcam;
@@ -385,11 +387,36 @@ public class KarerangTalonCore : MonoBehaviour
 
     private void MovePlayer()
     {
-        if (!isPlayerTurn) return;
+        if (!isPlayerTurn)
+        {
+            playerAnimator.SetBool("run", false);
+            playerAnimator.SetBool("jump", false);
+            playerAnimator.SetBool("idle", true);
+            return;
+        }
 
-        if (CurrentGameStateKT != GameStateKT.GAME) return;
+        if (CurrentGameStateKT != GameStateKT.GAME)
+        {
+            playerAnimator.SetBool("run", false);
+            playerAnimator.SetBool("jump", false);
+            playerAnimator.SetBool("idle", true);
+            return;
+        }
 
         playerRB.velocity = new Vector3(0f, playerRB.velocity.y, 1 * moveSpeed);
+
+        if (playerRB.velocity.y != 0)
+        {
+            playerAnimator.SetBool("run", false);
+            playerAnimator.SetBool("jump", true);
+            playerAnimator.SetBool("idle", false);
+        }
+        else
+        {
+            playerAnimator.SetBool("run", true);
+            playerAnimator.SetBool("jump", false);
+            playerAnimator.SetBool("idle", false);
+        }
     }
 
     private void JumpPlayer()
@@ -425,11 +452,36 @@ public class KarerangTalonCore : MonoBehaviour
 
     private void MoveEnemy()
     {
-        if (isPlayerTurn) return;
+        if (isPlayerTurn)
+        {
+            enemyAnimator.SetBool("run", false);
+            enemyAnimator.SetBool("jump", false);
+            enemyAnimator.SetBool("idle", true);
+            return;
+        }
 
-        if (CurrentGameStateKT != GameStateKT.GAME) return;
+        if (CurrentGameStateKT != GameStateKT.GAME)
+        {
+            enemyAnimator.SetBool("run", false);
+            enemyAnimator.SetBool("jump", false);
+            enemyAnimator.SetBool("idle", true);
+            return;
+        }
 
         enemyRB.velocity = new Vector3(0f, enemyRB.velocity.y, 1 * moveSpeed);
+
+        if (enemyRB.velocity.y != 0)
+        {
+            enemyAnimator.SetBool("run", false);
+            enemyAnimator.SetBool("jump", true);
+            enemyAnimator.SetBool("idle", false);
+        }
+        else
+        {
+            enemyAnimator.SetBool("run", true);
+            enemyAnimator.SetBool("jump", false);
+            enemyAnimator.SetBool("idle", false);
+        }
     }
 
     #region BUTTON
