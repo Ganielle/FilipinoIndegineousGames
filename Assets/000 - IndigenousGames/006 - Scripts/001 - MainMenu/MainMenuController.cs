@@ -13,21 +13,32 @@ public class MainMenuController : MonoBehaviour
         menuCore.CanInteract = true;
         menuCore.ResetMainMenuStateHistory();
         menuCore.OnMainMenuStateChange += StateChange;
+        menuCore.OnShopStateChange += ShopChange;
     }
 
     private void Start()
     {
+        GameManager.Instance.SceneController.AddActionLoadinList(menuCore.PopulateCharacterShop());
         GameManager.Instance.SceneController.ActionPass = true;
     }
 
     private void OnDisable()
     {
         menuCore.OnMainMenuStateChange -= StateChange;
+        menuCore.OnShopStateChange -= ShopChange;
     }
 
     private void StateChange(object sender, EventArgs e)
     {
         menuCore.Animation();
+    }
+
+    private void ShopChange(object sender, EventArgs e)
+    {
+        if (menuCore.CurrentShopState == MainMenuCore.ShopState.character)
+            menuCore.ShowCharShopItems();
+        else
+            menuCore.ShowCharTriviaItems();
     }
 
     #region BUTTONS

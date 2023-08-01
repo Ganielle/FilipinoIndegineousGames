@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using TMPro;
 using UnityEngine;
 using static UnityEngine.CullingGroup;
 
@@ -66,7 +67,35 @@ public class MainMenuCore : MonoBehaviour
         get => lastAppState;
     }
 
+    public enum ShopState
+    {
+        character,
+        trivia
+    };
+
+    public event EventHandler ShopStateChange;
+    public event EventHandler OnShopStateChange
+    {
+        add
+        {
+            if (ShopStateChange == null || !ShopStateChange.GetInvocationList().Contains(value))
+                ShopStateChange += value;
+        }
+        remove { ShopStateChange -= value; }
+    }
+    public ShopState CurrentShopState
+    {
+        get => currentShopState;
+        set
+        {
+            currentShopState = value;
+            ShopStateChange?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
     //  ===================================
+
+    [SerializeField] private PlayeData playerData;
 
     [Header("PANELS")]
     [SerializeField] private GameObject home;
@@ -78,9 +107,19 @@ public class MainMenuCore : MonoBehaviour
     [SerializeField] private GameObject journal;
     [SerializeField] private GameObject shop;
 
+    [Header("SHOP")]
+    [SerializeField] private GameObject characterObj;
+    [SerializeField] private GameObject triviaObj;
+    [SerializeField] private Transform characterContentTF;
+    [SerializeField] private Transform triviaContentTF;
+    [SerializeField] private GameObject charItemShop;
+    [SerializeField] private TextMeshProUGUI creditsTMP;
+    [SerializeField] private List<ShopCharData> charDataList;
+
     [Header("DEBUGGER")]
     [ReadOnly][SerializeField] private List<MainMenuState> appStateHistory;
     [ReadOnly][SerializeField] private MainMenuState lastAppState;
+    [ReadOnly][SerializeField] private ShopState currentShopState;
     [field: ReadOnly][field: SerializeField] public bool Back { get; set; }
     [field: ReadOnly][field: SerializeField] public bool CanInteract { get; set; }
 
@@ -168,6 +207,10 @@ public class MainMenuCore : MonoBehaviour
 
             case MainMenuState.SHOP:
 
+                CurrentShopState = ShopState.character;
+
+                creditsTMP.text = "Credits: " + playerData.Credits.ToString("n0");
+
                 shop.SetActive(true);
 
                 Back = false;
@@ -175,6 +218,49 @@ public class MainMenuCore : MonoBehaviour
                 break;
 
         }
+    }
+
+    public void ChangeShopState(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                CurrentShopState = ShopState.character;
+                break;
+            case 1:
+                CurrentShopState = ShopState.trivia;
+                break;
+        }
+    }
+
+    public IEnumerator PopulateCharacterShop()
+    {
+        if (playerData.UnlockedCharacters.Count == 0)
+            playerData.SetPlayerData();
+
+        while (playerData.UnlockedCharacters.Count == 0) yield return null;
+
+        for (int a = 0; a < charDataList.Count; a++)
+        {
+            GameObject obj = Instantiate(charItemShop, characterContentTF);
+
+            obj.GetComponent<ShopCharController>().shopCharData = charDataList[a];
+            obj.GetComponent<ShopCharController>().playerData = playerData;
+            obj.GetComponent<ShopCharController>().SetData(() => creditsTMP.text = playerData.Credits.ToString("n0"));
+            yield return null;
+        }
+    }
+
+    public void ShowCharShopItems()
+    {
+        characterObj.SetActive(true);
+        triviaObj.SetActive(false);
+    }
+
+    public void ShowCharTriviaItems()
+    {
+        characterObj.SetActive(false);
+        triviaObj.SetActive(true);
     }
 
     public void SelfBug()
