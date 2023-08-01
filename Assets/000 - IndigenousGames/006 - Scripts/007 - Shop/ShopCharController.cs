@@ -24,6 +24,21 @@ public class ShopCharController : MonoBehaviour
 
     //  =============================
 
+    private void OnEnable()
+    {
+        playerData.OnEquipCharacterChanged += CheckEquip;
+    }
+
+    private void OnDisable()
+    {
+        playerData.OnEquipCharacterChanged -= CheckEquip;
+    }
+
+    private void CheckEquip(object sender, EventArgs e)
+    {
+        CheckIfEquip();
+    }
+
     public void SetData(Action afterPurchase)
     {
         if (afterPurchase != null) this.afterPurchase = afterPurchase;

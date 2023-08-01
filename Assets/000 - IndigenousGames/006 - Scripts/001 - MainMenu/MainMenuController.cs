@@ -19,6 +19,7 @@ public class MainMenuController : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.SceneController.AddActionLoadinList(menuCore.PopulateCharacterShop());
+        GameManager.Instance.SceneController.AddActionLoadinList(menuCore.PopulateTriviaShop());
         GameManager.Instance.SceneController.ActionPass = true;
     }
 

@@ -113,8 +113,20 @@ public class MainMenuCore : MonoBehaviour
     [SerializeField] private Transform characterContentTF;
     [SerializeField] private Transform triviaContentTF;
     [SerializeField] private GameObject charItemShop;
+    [SerializeField] private GameObject triviaItemShop;
     [SerializeField] private TextMeshProUGUI creditsTMP;
     [SerializeField] private List<ShopCharData> charDataList;
+    [SerializeField] private List<TriviaData> triviaDataList;
+
+    [Header("JOURNAL")]
+    [SerializeField] private GameObject journalItemPrefab;
+    [SerializeField] private GameObject noItemObj;
+    [SerializeField] private GameObject journalViewport;
+    [SerializeField] private GameObject journalLoading;
+    [SerializeField] private Transform journalTF;
+    [SerializeField] private TextMeshProUGUI journalTriviaTMP;
+    [SerializeField] private GameObject journalTriviaObj;
+
 
     [Header("DEBUGGER")]
     [ReadOnly][SerializeField] private List<MainMenuState> appStateHistory;
@@ -122,6 +134,12 @@ public class MainMenuCore : MonoBehaviour
     [ReadOnly][SerializeField] private ShopState currentShopState;
     [field: ReadOnly][field: SerializeField] public bool Back { get; set; }
     [field: ReadOnly][field: SerializeField] public bool CanInteract { get; set; }
+
+    //  ====================
+
+    Coroutine populateJournal;
+
+    //  ====================
 
     public void Animation()
     {
@@ -199,6 +217,10 @@ public class MainMenuCore : MonoBehaviour
 
             case MainMenuState.JOURNAL:
 
+                if (populateJournal != null) StopCoroutine(populateJournal);
+
+                populateJournal = StartCoroutine(PopulateJournal());
+
                 journal.SetActive(true);
 
                 Back = false;
@@ -249,6 +271,66 @@ public class MainMenuCore : MonoBehaviour
             obj.GetComponent<ShopCharController>().SetData(() => creditsTMP.text = playerData.Credits.ToString("n0"));
             yield return null;
         }
+    }
+
+    public IEnumerator PopulateTriviaShop()
+    {
+        for (int a = 0; a < triviaDataList.Count; a++)
+        {
+            GameObject obj = Instantiate(triviaItemShop, triviaContentTF);
+
+            obj.GetComponent<TriviaController>().triviaData = triviaDataList[a];
+            obj.GetComponent<TriviaController>().CheckIfUnlocked();
+
+            yield return null;
+        }
+    }
+
+    private IEnumerator PopulateJournal()
+    {
+        journalLoading.SetActive(true);
+        noItemObj.SetActive(false);
+        journalViewport.SetActive(false);
+
+        while (journalTF.childCount > 0)
+        {
+            for (int a = 0; a < journalTF.childCount; a++)
+            {
+                Destroy(journalTF.GetChild(a).gameObject);
+                yield return null;
+            }
+
+            yield return null;
+        }
+
+        if (playerData.UnlockedTrivias.Count <= 0)
+        {
+            journalLoading.SetActive(false);
+            noItemObj.SetActive(true);
+            populateJournal = null;
+
+            yield break;
+        }
+
+        for (int a = 0; a < playerData.UnlockedTrivias.Count; a++)
+        {
+            GameObject obj = Instantiate(journalItemPrefab, journalTF);
+
+            obj.GetComponent<JournalItemController>().triviaData = triviaDataList.Find(e => e.itemID == playerData.UnlockedTrivias[a]);
+            obj.GetComponent<JournalItemController>().SetData(this);
+        }
+
+
+        journalLoading.SetActive(false);
+        journalViewport.gameObject.SetActive(true);
+
+        populateJournal = null;
+    }
+
+    public void ShowJournalContent(string content)
+    {
+        journalTriviaTMP.text = content;
+        journalTriviaObj.SetActive(true);
     }
 
     public void ShowCharShopItems()

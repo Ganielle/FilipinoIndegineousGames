@@ -1,7 +1,9 @@
 using MyBox;
 using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Player Data", menuName = "FilipinoGames/GameManager/Player")]
@@ -26,11 +28,28 @@ public class PlayeData : ScriptableObject
         }
     }
 
+    public List<string> UnlockedTrivias
+    {
+        get => unlockedTrivias;
+    }
+
+    private event EventHandler EquipCharacterChanged;
+    public event EventHandler OnEquipCharacterChanged
+    {
+        add
+        {
+            if (EquipCharacterChanged == null || !EquipCharacterChanged.GetInvocationList().Contains(value))
+                EquipCharacterChanged += value;
+        }
+        remove { EquipCharacterChanged -= value; }
+    }
+
     //  ==============================
 
     [ReadOnly][SerializeField] private int credits;
     [ReadOnly][SerializeField] private string equipCharacter;
     [ReadOnly][SerializeField] private List<string> unlockedCharacters;
+    [ReadOnly][SerializeField] private List<string> unlockedTrivias;
 
     public void SetPlayerData()
     {
@@ -61,6 +80,11 @@ public class PlayeData : ScriptableObject
             equipCharacter = "001";
             PlayerPrefs.SetString("equipChar", equipCharacter);
         }
+
+        if (PlayerPrefs.HasKey("unlockTrivias"))
+        {
+            unlockedTrivias = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("unlockTrivias"));
+        }
     }
 
     public void UnlockCharacter(string id)
@@ -73,5 +97,12 @@ public class PlayeData : ScriptableObject
     {
         equipCharacter = id;
         PlayerPrefs.SetString("equipChar", equipCharacter);
+        EquipCharacterChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void UnlockTrivia(string id)
+    {
+        unlockedTrivias.Add(id);
+        PlayerPrefs.SetString("unlockTrivias", JsonConvert.SerializeObject(unlockedTrivias).ToString());
     }
 }

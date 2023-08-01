@@ -40,12 +40,13 @@ public class KarerangTalonCore : MonoBehaviour
 
     //  =================================
 
+    [SerializeField] private PlayeData playerData;
+
     [Header("PLAYERS")]
     [SerializeField] private float stageOneJumpStrength;
     [SerializeField] private float stageTwoJumpStrength;
     [SerializeField] private float stageThreeJumpStrength;
     [SerializeField] private Rigidbody playerRB;
-    [SerializeField] private Animator playerAnimator;
 
     [Header("ENEMY")]
     [SerializeField] private Rigidbody enemyRB;
@@ -65,6 +66,7 @@ public class KarerangTalonCore : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timerTMP;
     [SerializeField] private GameObject playerTurnNowObj;
     [SerializeField] private GameObject AITurnNowObj;
+    [SerializeField] private List<GameObject> playerCharacterList;
 
     [Header("JUMP")]
     [SerializeField] private float speedMoveGauge;
@@ -84,6 +86,8 @@ public class KarerangTalonCore : MonoBehaviour
     [SerializeField] private GameObject pauseMenuObj;
 
     [Header("DEBUGGER")]
+    [ReadOnly][SerializeField] private GameObject characterObj;
+    [ReadOnly][SerializeField] private Animator playerAnimator;
     [ReadOnly][SerializeField] private GameStateKT currentGameStateKT;
     [ReadOnly][SerializeField] public int currentStage;
     [ReadOnly][SerializeField] private bool isPlayerTurn;
@@ -154,6 +158,10 @@ public class KarerangTalonCore : MonoBehaviour
 
         currentSpeedMoveGauge = speedMoveGauge;
         currentStage = 1;
+
+        characterObj = playerCharacterList.Find(e => e.name == playerData.EquippedCharacter);
+        characterObj.SetActive(true);
+        playerAnimator = characterObj.GetComponent<CharacterEquipController>().characterAnimator;
 
         countdownStart = StartCoroutine(StartCountdownAtStart());
 

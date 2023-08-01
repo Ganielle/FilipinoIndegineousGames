@@ -9,13 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8776173507282955420}
+  - component: {fileID: 1085119980}
   m_Layer: 6
   m_Name: Girl
   m_TagString: AI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8776173507282955420
 Transform:
   m_ObjectHideFlags: 0
@@ -23,7 +24,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5336723404171571631}
-  m_LocalRotation: {x: -0, y: 0.9043718, z: -0, w: 0.4267455}
+  m_LocalRotation: {x: 0, y: 0.9043733, z: 0, w: 0.4267424}
   m_LocalPosition: {x: -75.3, y: 157.04, z: 69.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -32,6 +33,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 129.478, z: 0}
+--- !u!114 &1085119980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5336723404171571631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a411a8de0ef3e748bf6d62bd207b404, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterAnimator: {fileID: 8480161228799022159}
 --- !u!1 &7412064216850832973
 GameObject:
   m_ObjectHideFlags: 0
