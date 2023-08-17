@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     //  ==========================================
 
     [field: SerializeField] public List<GameObject> GameMangerObj { get; set; }
+    [field: SerializeField] public GameObject LoadingNoBG { get; set; }
 
     [Space]
     [SerializeField] private string SceneToLoad;
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour
     [field: Header("MISCELLANEOUS SCRIPTS")]
     [field: SerializeField] public SceneController SceneController { get; set; }
     [field: SerializeField] public ErrorController ErrorControl { get; set; }
+    [field: SerializeField] public AudioManager AudioSystem { get; set; }
 
     //  ==========================================
 

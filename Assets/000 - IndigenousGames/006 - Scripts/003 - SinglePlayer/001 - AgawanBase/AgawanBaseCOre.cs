@@ -93,6 +93,7 @@ public class AgawanBaseCOre : MonoBehaviour
 
     [SerializeField] private CharacterController playerCC;
     [SerializeField] private Transform playerTF;
+    [SerializeField] private AudioClip bgClip;
 
     [Header("SPAWN POINTS")]
     [SerializeField] private Transform blueSpawnPoint;
@@ -141,6 +142,8 @@ public class AgawanBaseCOre : MonoBehaviour
     private void Awake()
     {
         currentCoinTMP.text = "0";
+
+        GameManager.Instance.AudioSystem.SetBGMusic(bgClip);
 
         OnTaggedCharacters += CheckTaggedPlayers;
     }

@@ -12,6 +12,7 @@ public class AIAgawanBaseController : MonoBehaviour
     [SerializeField] private AgawanBaseCOre.Team team;
     [SerializeField] private AgawanBaseKeeperBoundry boundry;
     [SerializeField] private Animator playerAnim;
+    [SerializeField] private GameObject indicator;
 
     [Header("ARTIFICIAL INTELIGENCE")]
     [SerializeField] private NavMeshAgent aiNavMesh;
@@ -138,7 +139,20 @@ public class AIAgawanBaseController : MonoBehaviour
     private void Update()
     {
         isPlayerTeammate = team == core.CurrentTeam ? true : false;
+
+        CheckTeamIndicator();
         RunTowardsWaypoint();
+    }
+
+    private void CheckTeamIndicator()
+    {
+        if (!isPlayerTeammate)
+        {
+            indicator.SetActive(false);
+            return;
+        }
+
+        indicator.SetActive(true);
     }
 
     private void RunTowardsWaypoint()

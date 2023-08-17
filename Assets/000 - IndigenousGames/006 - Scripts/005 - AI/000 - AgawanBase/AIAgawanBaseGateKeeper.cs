@@ -1,22 +1,41 @@
 using MyBox;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class AIAgawanBaseGateKeeper : MonoBehaviour
 {
     [SerializeField] private AgawanBaseCOre core;
+    [SerializeField] private AgawanBaseCOre.Team team;
     [SerializeField] private AgawanBaseKeeperBoundry boundry;
     [SerializeField] private Animator playerAnim;
+    [SerializeField] private GameObject indicator;
 
     [Header("ARTIFICIAL INTELIGENCE")]
     [SerializeField] private NavMeshAgent aiNavMesh;
     [SerializeField] private Transform gatekeeperPosition;
 
+    [Header("DEBUGGER")]
+    [ReadOnly][SerializeField] private bool isTeammate;
+
     private void Update()
     {
+        isTeammate = team == core.CurrentTeam ? true : false;
+        CheckTeamIndicator();
         MoveToDestination();
+    }
+
+    private void CheckTeamIndicator()
+    {
+        if (!isTeammate)
+        {
+            indicator.SetActive(false);
+            return;
+        }
+
+        indicator.SetActive(true);
     }
 
     private void MoveToDestination()

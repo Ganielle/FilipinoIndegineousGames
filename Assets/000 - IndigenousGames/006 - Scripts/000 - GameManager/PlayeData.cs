@@ -57,7 +57,7 @@ public class PlayeData : ScriptableObject
             credits = PlayerPrefs.GetInt("credits");
         else
         {
-            credits = 0;
+            credits = 9999;
             PlayerPrefs.SetInt("credits", credits);
         }
 

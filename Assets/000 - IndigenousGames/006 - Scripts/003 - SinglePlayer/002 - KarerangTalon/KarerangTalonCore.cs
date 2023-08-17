@@ -41,6 +41,7 @@ public class KarerangTalonCore : MonoBehaviour
     //  =================================
 
     [SerializeField] private PlayeData playerData;
+    [SerializeField] private AudioClip bgMusic;
 
     [Header("PLAYERS")]
     [SerializeField] private float stageOneJumpStrength;
@@ -112,6 +113,7 @@ public class KarerangTalonCore : MonoBehaviour
 
     private void OnEnable()
     {
+        GameManager.Instance.SceneController.AddActionLoadinList(ChangeBGMusic());
         GameManager.Instance.SceneController.AddActionLoadinList(Initialize());
         GameManager.Instance.SceneController.ActionPass = true;
     }
@@ -131,6 +133,13 @@ public class KarerangTalonCore : MonoBehaviour
     }
 
     #region INITIALIZATION
+
+    private IEnumerator ChangeBGMusic()
+    {
+        GameManager.Instance.AudioSystem.SetBGMusic(bgMusic);
+
+        yield return null;
+    }
 
     private IEnumerator Initialize()
     {

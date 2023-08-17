@@ -7,6 +7,7 @@ using UnityEngine;
 public class MainMenuController : MonoBehaviour
 {
     [SerializeField] private MainMenuCore menuCore;
+    [SerializeField] private LobbyController lobby;
 
     private void Awake()
     {
@@ -18,8 +19,10 @@ public class MainMenuController : MonoBehaviour
 
     private void Start()
     {
+        GameManager.Instance.SceneController.AddActionLoadinList(GameManager.Instance.AudioSystem.CheckVolumeSaveData());
         GameManager.Instance.SceneController.AddActionLoadinList(menuCore.PopulateCharacterShop());
         GameManager.Instance.SceneController.AddActionLoadinList(menuCore.PopulateTriviaShop());
+        GameManager.Instance.SceneController.AddActionLoadinList(menuCore.ChangeBackgroundMusic());
         GameManager.Instance.SceneController.ActionPass = true;
     }
 
@@ -77,6 +80,12 @@ public class MainMenuController : MonoBehaviour
     public void ComingSoon()
     {
         GameManager.Instance.ErrorControl.ShowError("FEATURE COMING SOON!", null);
+    }
+
+    public void Multiplayer(string mapCode)
+    {
+        lobby.currentMapCode = mapCode;
+        lobby.MultiplayerConnect();
     }
 
     #endregion

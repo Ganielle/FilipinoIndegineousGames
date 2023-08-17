@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/000 - IndigenousGames/007 - Scenes/KarerangTalon.unity
     guid: 578c57d8cd2882143b099bf9373d5336
+  - enabled: 1
+    path: Assets/000 - IndigenousGames/007 - Scenes/Patintero.unity
+    guid: 7968d686181e1fd4a9fa792ca3463eb7
+  - enabled: 1
+    path: Assets/000 - IndigenousGames/007 - Scenes/KarerangTalonMultiplayer.unity
+    guid: e985fbc7b193054418b62637c20b27d6
   m_configObjects: {}

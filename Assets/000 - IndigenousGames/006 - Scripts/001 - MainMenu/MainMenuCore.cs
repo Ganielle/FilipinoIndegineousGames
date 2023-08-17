@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using static UnityEngine.CullingGroup;
 
 public class MainMenuCore : MonoBehaviour
@@ -20,7 +21,8 @@ public class MainMenuCore : MonoBehaviour
         LEADERBOARDS,
         SETTINGS,
         JOURNAL,
-        SHOP
+        SHOP,
+        CREDITS
     }
 
     public event EventHandler MainMenuStateChange;
@@ -96,6 +98,7 @@ public class MainMenuCore : MonoBehaviour
     //  ===================================
 
     [SerializeField] private PlayeData playerData;
+    [SerializeField] private AudioClip bgMusic;
 
     [Header("PANELS")]
     [SerializeField] private GameObject home;
@@ -126,6 +129,10 @@ public class MainMenuCore : MonoBehaviour
     [SerializeField] private Transform journalTF;
     [SerializeField] private TextMeshProUGUI journalTriviaTMP;
     [SerializeField] private GameObject journalTriviaObj;
+
+    [Header("CREDITS")]
+    [SerializeField] private GameObject creditsObj;
+    [SerializeField] private Slider volumeSlider;
 
 
     [Header("DEBUGGER")]
@@ -208,7 +215,14 @@ public class MainMenuCore : MonoBehaviour
                 break;
 
             case MainMenuState.SETTINGS: 
-                
+
+                if (Back)
+                {
+                    if (LastMainMenuState == MainMenuState.CREDITS)
+                        creditsObj.SetActive(false);
+                }
+
+                volumeSlider.value = GameManager.Instance.AudioSystem.CurrentVolume;
                 settings.SetActive(true);
 
                 Back = false;
@@ -239,6 +253,15 @@ public class MainMenuCore : MonoBehaviour
                 CanInteract = true;
                 break;
 
+            case MainMenuState.CREDITS:
+
+                settings.SetActive(false);
+                creditsObj.SetActive(true);
+
+                Back = false;
+                CanInteract = true;
+
+                break;
         }
     }
 
@@ -343,6 +366,18 @@ public class MainMenuCore : MonoBehaviour
     {
         characterObj.SetActive(false);
         triviaObj.SetActive(true);
+    }
+
+    public IEnumerator ChangeBackgroundMusic()
+    {
+        GameManager.Instance.AudioSystem.SetBGMusic(bgMusic);
+
+        yield return null;
+    }
+
+    public void ChangeVolumeSettings()
+    {
+        GameManager.Instance.AudioSystem.CurrentVolume = volumeSlider.value;
     }
 
     public void SelfBug()

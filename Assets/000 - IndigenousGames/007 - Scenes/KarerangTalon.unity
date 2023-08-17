@@ -14176,6 +14176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerData: {fileID: 11400000, guid: 42cf70c9b588afb4981a13d3d0b0397e, type: 2}
+  bgMusic: {fileID: 8300000, guid: b18296a14296d134ebcc29fedcaaf430, type: 3}
   stageOneJumpStrength: 4.5
   stageTwoJumpStrength: 5.5
   stageThreeJumpStrength: 10
