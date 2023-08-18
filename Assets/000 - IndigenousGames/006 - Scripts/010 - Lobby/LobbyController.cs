@@ -4,6 +4,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -60,6 +61,7 @@ public class LobbyController : MonoBehaviourPunCallbacks
     [ReadOnly][SerializeField] private LobbyState currentLobbyState;
     [ReadOnly][SerializeField] private float currentTimeFind;
     [ReadOnly] public string currentMapCode;
+    [ReadOnly][SerializeField] private List<Player> playerList;
 
     //  =========================
 
@@ -73,6 +75,7 @@ public class LobbyController : MonoBehaviourPunCallbacks
     private void OnEnable()
     {
         base.OnEnable();
+        playerList = new List<Player>();
         OnLobbyStateChange += CheckLobbyState;
         PhotonNetwork.NetworkingClient.EventReceived += MatchmakingEvents;
     }
@@ -174,6 +177,9 @@ public class LobbyController : MonoBehaviourPunCallbacks
         base.OnJoinedRoom();
         CurrentLobbyState = LobbyState.FINDING;
         PhotonNetwork.AutomaticallySyncScene = true;
+
+        if (PhotonNetwork.IsMasterClient)
+            playerList.Add(PhotonNetwork.LocalPlayer);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -182,32 +188,53 @@ public class LobbyController : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.IsMasterClient)
         {
-            int status = (int)LobbyState.FOUND;
+            Debug.Log("player entered");
+            
+            if (!playerList.Contains(newPlayer))
+                playerList.Add(newPlayer);
 
-            object[] data = new object[]
+            Debug.Log(playerList.Count);
+
+            if (playerList.Count >= 6)
             {
+                int status = (int)LobbyState.FOUND;
+
+                object[] data = new object[]
+                {
                 status
-            };
+                };
 
-            RaiseEventOptions raiseEventOptions = new RaiseEventOptions
-            {
-                Receivers = ReceiverGroup.Others
-            };
-            SendOptions sendOptions = new SendOptions
-            {
-                Reliability = true
-            };
-            PhotonNetwork.RaiseEvent(19, data, raiseEventOptions, sendOptions);
-            CurrentLobbyState = LobbyState.FOUND;
+                RaiseEventOptions raiseEventOptions = new RaiseEventOptions
+                {
+                    Receivers = ReceiverGroup.Others
+                };
+                SendOptions sendOptions = new SendOptions
+                {
+                    Reliability = true
+                };
+                PhotonNetwork.RaiseEvent(19, data, raiseEventOptions, sendOptions);
+                CurrentLobbyState = LobbyState.FOUND;
 
-            StartCoroutine(MatchFoundTimerCountdown());
+                StartCoroutine(MatchFoundTimerCountdown());
+            }
+        }
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        base.OnPlayerLeftRoom(otherPlayer);
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (playerList.Contains(otherPlayer))
+                playerList.Remove(otherPlayer);
         }
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         //  Create room when joining room failed
-        CreateRoom(currentMapCode, 2);
+        CreateRoom(currentMapCode, 6);
     }
 
     #endregion
@@ -327,6 +354,9 @@ public class LobbyController : MonoBehaviourPunCallbacks
     {
         findingMatchBackBtn.interactable = false;
 
+        if (playerList.Count > 0)
+            playerList.Clear();
+
         StartCoroutine(DisconnectToServer(() =>
         {
             PhotonNetwork.ConnectUsingSettings();
@@ -339,13 +369,16 @@ public class LobbyController : MonoBehaviourPunCallbacks
         lobbyBackBtn.interactable = false;
 
         ExitGames.Client.Photon.Hashtable customFilterMap = new ExitGames.Client.Photon.Hashtable { { "MAP", currentMapCode } };
-        PhotonNetwork.JoinRandomRoom(customFilterMap, 2);
+        PhotonNetwork.JoinRandomRoom(customFilterMap, 6);
         CurrentLobbyState = LobbyState.FINDING;
     }
 
     public void CancelMultiplayer()
     {
         lobbyBackBtn.interactable = false;
+
+        if (playerList.Count > 0)
+            playerList.Clear();
 
         StartCoroutine(DisconnectToServer(() =>
         {

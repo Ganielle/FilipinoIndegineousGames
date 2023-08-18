@@ -91,6 +91,7 @@ public class AgawanBaseCOre : MonoBehaviour
 
     //  ================================================
 
+    [SerializeField] private PlayeData playerData;
     [SerializeField] private CharacterController playerCC;
     [SerializeField] private Transform playerTF;
     [SerializeField] private AudioClip bgClip;
@@ -181,13 +182,15 @@ public class AgawanBaseCOre : MonoBehaviour
         CurrentMatchState = MatchState.GETREADY;
 
         float time = 3f;
-        countdownTMP.text = time.ToString("n0");
+        string currentTeam = CurrentTeam == Team.BLUE ? "BLUE" : "RED";
+
+        countdownTMP.text = time.ToString("n0") + "\n YOU'RE ON " + currentTeam + " TEAM";
 
         countdownPanel.SetActive(true);
 
         while (time > 0f)
         {
-            countdownTMP.text = time.ToString("n0");
+            countdownTMP.text = time.ToString("n0") + "\n YOU'RE ON " + currentTeam + " TEAM"; ;
             time -= Time.deltaTime;
 
             yield return null;
@@ -225,6 +228,7 @@ public class AgawanBaseCOre : MonoBehaviour
                 finishStatusTMP.text = "RED TEAM WINS!";
 
                 earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+                playerData.Credits += currentCollectedCoin;
             }
             else if (taggedRedList.Count >= 4)
             {
@@ -235,6 +239,7 @@ public class AgawanBaseCOre : MonoBehaviour
                 finishStatusTMP.text = "BLUE TEAM WINS!";
 
                 earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+                playerData.Credits += currentCollectedCoin;
             }
         }
         else
@@ -248,6 +253,7 @@ public class AgawanBaseCOre : MonoBehaviour
                 finishStatusTMP.text = "BLUE TEAM WINS!";
 
                 earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+                playerData.Credits += currentCollectedCoin;
             }
             else if (taggedBlueList.Count >= 4)
             {
@@ -258,6 +264,7 @@ public class AgawanBaseCOre : MonoBehaviour
                 finishStatusTMP.text = "RED TEAM WINS!";
 
                 earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+                playerData.Credits += currentCollectedCoin;
             }
         }
     }
@@ -305,6 +312,8 @@ public class AgawanBaseCOre : MonoBehaviour
             finishStatusTMP.text = CurrentTeam == Team.BLUE ? "BLUE TEAM WINS!" : "RED TEAM WINS!";
 
         earningStatusTMP.text = "YOU EARNED " + currentCollectedCoin.ToString("n0") + " COINS";
+        playerData.Credits += currentCollectedCoin;
+
     }
 
     public void AddRedTeamScore()

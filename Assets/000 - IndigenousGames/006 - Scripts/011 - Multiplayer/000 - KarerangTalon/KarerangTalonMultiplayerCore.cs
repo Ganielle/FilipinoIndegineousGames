@@ -56,24 +56,23 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         set => currentKTTeam = value;
     }
 
-
-    private event EventHandler TeamTurnChange;
-    public event EventHandler OnTeamTurnChange
+    private event EventHandler CurrentPlayerIndexChange;
+    public event EventHandler OnCurrentPlayerIndexChange
     {
         add
         {
-            if (TeamTurnChange == null || !TeamTurnChange.GetInvocationList().Contains(value))
-                TeamTurnChange += value;
+            if (CurrentPlayerIndexChange == null || !CurrentPlayerIndexChange.GetInvocationList().Contains(value))
+                CurrentPlayerIndexChange += value;
         }
-        remove { TeamTurnChange -= value; }
+        remove { CurrentPlayerIndexChange -= value; }
     }
-    public KTTeam TeamTurn
+    public int CurrentPlayerIndex
     {
-        get => teamTurn;
+        get => currentTurnIndex;
         set
         {
-            teamTurn = value;
-            TeamTurnChange?.Invoke(this, EventArgs.Empty);
+            currentTurnIndex = value;
+            CurrentPlayerIndexChange?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -103,6 +102,8 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject playerIndicator;
     [SerializeField] private GameObject enemyIndicator;
     [SerializeField] private GameObject jumpButtonObj;
+    [SerializeField] private GameObject teamIndicator;
+    [SerializeField] private TextMeshProUGUI playerIndicatorTMP;
 
     [Header("TIMER")]
     [SerializeField] private GameObject startCountdownTimerObj;
@@ -114,6 +115,9 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     [SerializeField] private TextMeshProUGUI earningStatusTMP;
     [SerializeField] private GameObject finishStatusObj;
 
+    [Header("TEAM")]
+    [SerializeField] private List<Button> playerItemTeam; 
+
     [Header("PAUSE MENU")]
     [SerializeField] private GameObject pauseMenuObj;
 
@@ -121,8 +125,6 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     [ReadOnly][SerializeField] private KTMultiplayerState currentKTState;
     [ReadOnly][SerializeField] private KTTeam currentKTTeam;
     [ReadOnly][SerializeField] private GameObject myPlayerObj;
-    [ReadOnly][SerializeField] private GameObject enemyPlayerObj;
-    [ReadOnly][SerializeField] private KTTeam teamTurn;
     [ReadOnly][SerializeField] private float playerOneCurrentTimer;
     [ReadOnly][SerializeField] private float playerTwoCurrentTimer;
     [ReadOnly] public int currentStage;
@@ -131,11 +133,13 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     [ReadOnly][SerializeField] private float currentSpeedMoveGauge;
     [ReadOnly][SerializeField] private bool moveForward;
     [ReadOnly][SerializeField] KTTeam winner;
+    [ReadOnly][SerializeField] private int currentTurnIndex;
 
     //  ============================
 
-    Dictionary<string, bool> readyPlayers;
-    Dictionary<KTTeam, bool> donePlayers;
+    Dictionary<Player, bool> readyPlayers;
+    Dictionary<Player, bool> donePlayers;
+    Dictionary<Player, GameObject> playerObjs;
 
     //  ============================
 
@@ -155,6 +159,11 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
     Coroutine gameplayTimerCoroutine;
 
+    List<Player> playerList;
+
+    List<Player> redTeamList;
+    List<Player> blueTeamList;
+
     //  ============================
 
 
@@ -162,21 +171,17 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     {
         base.OnEnable();
 
-        readyPlayers = new Dictionary<string, bool>
-        {
-            { "player1", false },
-            { "player2", false }
-        };
-        donePlayers = new Dictionary<KTTeam, bool>
-        {
-            { KTTeam.RED, false },
-            { KTTeam.BLUE, false }
-        };
+        playerList = new List<Player>();
+        redTeamList = new List<Player>();
+        blueTeamList = new List<Player>();
+        readyPlayers = new Dictionary<Player, bool>();
+        donePlayers = new Dictionary<Player, bool>();
+        playerObjs = new Dictionary<Player, GameObject>();
 
         InitializeHost();
         InitializePlayer();
         OnKTMultiplayerStateChange += KTStateEvents;
-        OnTeamTurnChange += TeamTurnEvents;
+        OnCurrentPlayerIndexChange += TeamTurnEvents;
         PhotonNetwork.NetworkingClient.EventReceived += GameMultiplayerEvents;
     }
 
@@ -185,7 +190,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         base.OnDisable();
 
         OnKTMultiplayerStateChange -= KTStateEvents;
-        OnTeamTurnChange += TeamTurnEvents;
+        OnCurrentPlayerIndexChange -= TeamTurnEvents;
         PhotonNetwork.NetworkingClient.EventReceived -= GameMultiplayerEvents;
     }
 
@@ -203,10 +208,13 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         {
             object[] dataState = (object[])obj.CustomData;
 
-            if (Convert.ToInt32(dataState[0]) == 2)
-                CurrentKTTeam = KTTeam.BLUE;
+            if ((KTTeam)Convert.ToInt32(dataState[0]) == KTTeam.RED)
+                redTeamList.Add((Player)dataState[1]);
             else
-                CurrentKTTeam = KTTeam.RED;
+                blueTeamList.Add((Player)dataState[1]);
+
+            if ((Player)dataState[1] == PhotonNetwork.LocalPlayer)
+                CurrentKTTeam = (KTTeam)Convert.ToInt32(dataState[0]);
         }
 
         //  INSTANTIATE ENEMY OBJECT
@@ -219,7 +227,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
             objPlayer.GetComponent<PhotonView>().ViewID = (int)dataState[0];
             objPlayer.GetComponent<PlayerKTMController>().ActivateCostume(dataState[1].ToString());
 
-            enemyPlayerObj = objPlayer;
+            playerObjs[(Player)dataState[2]] = objPlayer;
         }
 
 
@@ -228,7 +236,10 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         {
             object[] dataState = (object[])obj.CustomData;
 
-            TeamTurn = (KTTeam) Convert.ToInt32(dataState[0]);
+            playerList.Add((Player)dataState[0]);
+            readyPlayers.Add((Player)dataState[0], false);
+            donePlayers.Add((Player)dataState[0], false);
+            playerObjs.Add((Player)dataState[0], null);
         }
 
         //  SET PLAYER READY STATE
@@ -236,7 +247,8 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         {
             object[] dataState = (object[])obj.CustomData;
 
-            readyPlayers[dataState[0].ToString()] = true;
+            readyPlayers[(Player)dataState[0]] = true;
+            donePlayers[(Player)dataState[0]] = false;
         }
 
         //  PLAYER OBJECT ENABLER
@@ -244,7 +256,21 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         {
             object[] dataState = (object[])obj.CustomData;
 
-            enemyPlayerObj.SetActive((bool)dataState[0]);
+            playerObjs[(Player)dataState[1]].SetActive((bool)dataState[0]);
+
+            if (playerObjs.Count >= 6)
+            {
+                if (CurrentPlayerIndex <= 0)
+                {
+                    if (playerObjs.ElementAt(5).Value != null)
+                        playerObjs.ElementAt(5).Value.SetActive(false);
+                }
+                else
+                {
+                    if (playerObjs.ElementAt(CurrentPlayerIndex - 1).Value != null)
+                        playerObjs.ElementAt(CurrentPlayerIndex - 1).Value.SetActive(false);
+                }
+            }
         }
 
         //  CHANGE KT STATE
@@ -277,22 +303,29 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         {
             object[] dataState = (object[])obj.CustomData;
 
-            TeamTurn = (KTTeam)Convert.ToInt32(dataState[0]);
+            CurrentPlayerIndex = Convert.ToInt32(dataState[0]);
+
+            for (int a = 0; a < playerItemTeam.Count; a++)
+            {
+                playerItemTeam[a].interactable = false;
+            }
+
+            playerItemTeam[CurrentPlayerIndex].interactable = true;
         }
 
         if (obj.Code == 30)
         {
             object[] dataState = (object[])obj.CustomData;
 
-            enemyPlayerObj.SetActive((bool)dataState[0]);
-            myPlayerObj.SetActive((bool)dataState[1]);
+            //enemyPlayerObj.SetActive((bool)dataState[0]);
+            //myPlayerObj.SetActive((bool)dataState[1]);
         }
 
         if (obj.Code == 31)
         {
             object[] dataState = (object[])obj.CustomData;
 
-            donePlayers[(KTTeam)Convert.ToInt32(dataState[0])] = (bool) dataState[1];
+            donePlayers[(Player)dataState[0]] = (bool) dataState[1];
         }
 
         if (obj.Code == 32)
@@ -308,12 +341,27 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
 
             if ((KTTeam)Convert.ToInt32(dataState[0]) == KTTeam.DRAW)
+            {
+                playerData.Credits += 15;
                 finishStatusTMP.text = "THE MATCH IS DRAW!";
+                earningStatusTMP.text = "YOU EARNED 15 COIN";
+            }
             else
-                finishStatusTMP.text = (KTTeam)Convert.ToInt32(dataState[0]) == CurrentKTTeam ? 
-                    "YOU WIN!" : "YOU LOSE! THE ENEMY TEAM WINS!";
+            {
 
-            earningStatusTMP.text = "YOU EARNED 0 COIN";
+                if ((KTTeam)Convert.ToInt32(dataState[0]) == CurrentKTTeam)
+                {
+                    playerData.Credits += 25;
+                    finishStatusTMP.text = "YOU LOSE! THE ENEMY TEAM WINS!";
+                    earningStatusTMP.text = "YOU EARNED 25 COIN";
+                }
+                else
+                {
+                    playerData.Credits += 50;
+                    finishStatusTMP.text = "YOU WIN!";
+                    earningStatusTMP.text = "YOU EARNED 50 COIN";
+                }
+            }
 
             finishStatusObj.SetActive(true);
             pauseMenuObj.SetActive(false);
@@ -330,7 +378,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         GameManager.Instance.AudioSystem.SetBGMusic(bgCLip);
         GameManager.Instance.SceneController.AddActionLoadinList(SetPlayerTeam());
         GameManager.Instance.SceneController.AddActionLoadinList(SpawnPlayerHost());
-        GameManager.Instance.SceneController.AddActionLoadinList(SetFirstTurn());
+        GameManager.Instance.SceneController.AddActionLoadinList(SetTeamUI());
         GameManager.Instance.SceneController.AddActionLoadinList(CheckAllPlayerIfReadyHost());
         GameManager.Instance.SceneController.ActionPass = true;
     }
@@ -342,6 +390,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         currentStage = 1;
         GameManager.Instance.AudioSystem.SetBGMusic(bgCLip);
         GameManager.Instance.SceneController.AddActionLoadinList(WaitForPlayerTeam());
+        GameManager.Instance.SceneController.AddActionLoadinList(SetTeamUI());
         GameManager.Instance.SceneController.AddActionLoadinList(CheckAllPlayerReadyPlayer());
         GameManager.Instance.SceneController.ActionPass = true;
     }
@@ -351,27 +400,64 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     IEnumerator SetPlayerTeam()
     {
         gameplayTimerTMP.text = string.Format("{0:00}:{1:00}", 0f, 0f);
-        int randTeam = UnityEngine.Random.Range(0, 2);
 
-        if (randTeam == 0)
+        foreach (Player player in PhotonNetwork.PlayerList)
         {
-            CurrentKTTeam = KTTeam.RED;
+            playerList.Add(player);
+            yield return null;
+        }
+
+        yield return playerList.Shuffle();
+
+        for (int a = 0; a < playerList.Count; a++)
+        {
+            #region POPULATE PLAYER LIST DICTIONARY
+
+            readyPlayers.Add(playerList[a], false);
+            donePlayers.Add(playerList[a], false);
+            playerObjs.Add(playerList[a], null);
 
             data = new object[]
             {
-                (int) KTTeam.BLUE
+                playerList[a]
             };
-        }
-        else
-        {
-            CurrentKTTeam = KTTeam.BLUE;
 
-            data = new object[]
+            PhotonNetwork.RaiseEvent(23, data, raiseEventOptions, sendOptions);
+
+            #endregion
+            #region ASSIGN TEAM
+            if (a <= 2)
             {
-                (int) KTTeam.RED
-            };
+                redTeamList.Add(playerList[a]);
+                if (playerList[a] == PhotonNetwork.LocalPlayer)
+                    CurrentKTTeam = KTTeam.RED;
+                else
+                {
+                    data = new object[]
+                    {
+                        (int) KTTeam.RED, playerList[a]
+                    };
+                    PhotonNetwork.RaiseEvent(21, data, raiseEventOptions, sendOptions);
+                }
+            }
+            else
+            {
+                blueTeamList.Add(playerList[a]);
+                if (playerList[a] == PhotonNetwork.LocalPlayer)
+                    CurrentKTTeam = KTTeam.BLUE;
+                else
+                {
+                    data = new object[]
+                    {
+                        (int) KTTeam.BLUE, playerList[a]
+                    };
+                    PhotonNetwork.RaiseEvent(21, data, raiseEventOptions, sendOptions);
+                }
+            }
+            #endregion
+            yield return null;
         }
-        PhotonNetwork.RaiseEvent(21, data, raiseEventOptions, sendOptions);
+
         yield return null;
     }
 
@@ -389,56 +475,72 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
             data = new object[]
             {
                 player.ViewID,
-                playerData.EquippedCharacter
+                playerData.EquippedCharacter,
+                PhotonNetwork.LocalPlayer
             };
 
             PhotonNetwork.RaiseEvent(22, data, raiseEventOptions, sendOptions);
         }
 
+        playerObjs[PhotonNetwork.LocalPlayer] = obj;
+        obj.SetActive(false);
         myPlayerObj = obj;
 
-        myPlayerObj.SetActive(false);
         data = new object[]
         {
-            false
+            false, PhotonNetwork.LocalPlayer
         };
 
         PhotonNetwork.RaiseEvent(25, data, raiseEventOptions, sendOptions);
 
-        myPlayerObj.transform.position = spawnPoint;
+        obj.transform.position = spawnPoint;
 
         yield return null;
     }
 
-    IEnumerator SetFirstTurn()
+    //IEnumerator SetFirstTurn()
+    //{
+    //    while (playerObjs.Count < 6) yield return null;
+
+    //    int randTeam = UnityEngine.Random.Range(0, 2);
+
+    //    if (randTeam == 0)
+    //        TeamTurn = KTTeam.RED;
+    //    else
+    //        TeamTurn = KTTeam.BLUE;
+
+    //    data = new object[]
+    //    {
+    //        (int) TeamTurn
+    //    };
+    //    PhotonNetwork.RaiseEvent(23, data, raiseEventOptions, sendOptions);
+
+    //    yield return null;
+    //}
+
+    IEnumerator SetTeamUI()
     {
-        while (enemyPlayerObj == null && myPlayerObj == null) yield return null;
-
-        int randTeam = UnityEngine.Random.Range(0, 2);
-
-        if (randTeam == 0)
-            TeamTurn = KTTeam.RED;
-        else
-            TeamTurn = KTTeam.BLUE;
-
-        data = new object[]
+        for (int a = 0; a < playerItemTeam.Count; a++)
         {
-            (int) TeamTurn
-        };
-        PhotonNetwork.RaiseEvent(23, data, raiseEventOptions, sendOptions);
+            playerItemTeam[a].interactable = false;
+            yield return null;
+        }
 
-        yield return null;
+        playerItemTeam[CurrentPlayerIndex].interactable = true;
     }
 
     IEnumerator CheckAllPlayerIfReadyHost()
     {
-        while (enemyPlayerObj == null && myPlayerObj == null) yield return null;
+        while (playerObjs.Count < 6) yield return null;
 
-        readyPlayers["player1"] = true;
+        ChangeVCamPlayer();
+
+        readyPlayers[PhotonNetwork.LocalPlayer] = true;
+        donePlayers[PhotonNetwork.LocalPlayer] = false;
 
         data = new object[]
         {
-            "player1"
+            PhotonNetwork.LocalPlayer
         };
 
         PhotonNetwork.RaiseEvent(24, data, raiseEventOptions, sendOptions);
@@ -483,47 +585,43 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
             data = new object[]
             {
                 player.ViewID,
-                playerData.EquippedCharacter
+                playerData.EquippedCharacter,
+                PhotonNetwork.LocalPlayer
             };
 
             PhotonNetwork.RaiseEvent(22, data, raiseEventOptions, sendOptions);
         }
 
+        playerObjs[PhotonNetwork.LocalPlayer] = obj;
         myPlayerObj = obj;
-
         data = new object[]
         {
-            false
+            false, PhotonNetwork.LocalPlayer
         };
 
         PhotonNetwork.RaiseEvent(25, data, raiseEventOptions, sendOptions);
 
-        myPlayerObj.SetActive(false);
-        myPlayerObj.transform.position = spawnPoint;
-
-        data = new object[]
-        {
-            false
-        };
-
-        PhotonNetwork.RaiseEvent(25, data, raiseEventOptions, sendOptions);
+        obj.SetActive(false);
+        obj.transform.position = spawnPoint;
     }
 
     IEnumerator CheckAllPlayerReadyPlayer()
     {
-        while (enemyPlayerObj == null && myPlayerObj == null) yield return null;
+        while (playerObjs.Count < 6) yield return null;
 
-        readyPlayers["player2"] = true;
+        readyPlayers[PhotonNetwork.LocalPlayer] = true;
+        donePlayers[PhotonNetwork.LocalPlayer] = false;
 
         data = new object[]
         {
-            "player2"
+            PhotonNetwork.LocalPlayer
         };
 
         PhotonNetwork.RaiseEvent(24, data, raiseEventOptions, sendOptions);
 
-        while (readyPlayers.Values.Contains(false)) yield return null;
+        ChangeVCamPlayer();
 
+        while (readyPlayers.Values.Contains(false)) yield return null;
     }
 
     #endregion
@@ -582,7 +680,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
     IEnumerator GameplayeTimerCount()
     {
-        float currentTime = TeamTurn == CurrentKTTeam ? playerOneCurrentTimer : playerTwoCurrentTimer;
+        float currentTime = CurrentPlayerIndex <= 2 ? playerOneCurrentTimer : playerTwoCurrentTimer;
         float minutes, seconds;
 
         minutes = Mathf.FloorToInt(currentTime / 60);
@@ -610,7 +708,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
             currentTime += 1f;
 
-            if (TeamTurn == CurrentKTTeam)
+            if (CurrentPlayerIndex <= 2)
                 playerOneCurrentTimer = currentTime;
             else
                 playerTwoCurrentTimer = currentTime;
@@ -638,24 +736,35 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     {
         if (CurrentKTState != KTMultiplayerState.COUNTDOWN) return;
 
-        if (teamTurn == CurrentKTTeam)
-        {
-            myPlayerObj.SetActive(true);
-
-            data = new object[]
-            {
-                true
-            };
-        }
+        if (playerList.ElementAt(CurrentPlayerIndex) == PhotonNetwork.LocalPlayer)
+            playerObjs[PhotonNetwork.LocalPlayer].SetActive(true);
         else
-        {
-            myPlayerObj.SetActive(false);
+            playerObjs.ElementAt(CurrentPlayerIndex).Value.SetActive(true);
 
-            data = new object[]
+        if (CurrentPlayerIndex <= 0)
+            playerObjs.ElementAt(5).Value.SetActive(false);
+        else
+            playerObjs.ElementAt(CurrentPlayerIndex - 1).Value.SetActive(false);
+
+        if (playerObjs.Count >= 6)
+        {
+            if (CurrentPlayerIndex <= 0)
             {
-                false
-            };
+                if (playerObjs.ElementAt(5).Value != null)
+                    playerObjs.ElementAt(5).Value.SetActive(false);
+            }
+            else
+            {
+                if (playerObjs.ElementAt(CurrentPlayerIndex - 1).Value != null)
+                    playerObjs.ElementAt(CurrentPlayerIndex - 1).Value.SetActive(false);
+            }
         }
+
+        data = new object[]
+        {
+            true, playerList.ElementAt(CurrentPlayerIndex)
+        };
+
         PhotonNetwork.RaiseEvent(25, data, raiseEventOptions, sendOptions);
     }
 
@@ -678,69 +787,37 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         if (!PhotonNetwork.IsMasterClient) return;
 
         StartCoroutine(ChangeToTimer(0f));
-
-        if (CurrentKTTeam == TeamTurn)
-        {
-            myPlayerObj.SetActive(true);
-            enemyPlayerObj.SetActive(false);
-
-            data = new object[]
-            {
-                true,
-                false
-            };
-        }
-        else
-        {
-            myPlayerObj.SetActive(false);
-            enemyPlayerObj.SetActive(true);
-
-            data = new object[]
-            {
-                false,
-                true
-            };
-        }
-
-        PhotonNetwork.RaiseEvent(30, data, raiseEventOptions, sendOptions);
-
-        //  change to countdown
     }
 
     public void TellServerToNextPlayer()
     {
-        KTTeam nextTeam = CurrentKTTeam == KTTeam.BLUE ? KTTeam.RED : KTTeam.BLUE;
-
         currentStage = 1;
 
         myPlayerObj.SetActive(false);
 
         if (donePlayers.ContainsValue(false))
         {
-            if (!donePlayers[nextTeam])
-            {
-                data = new object[]
-                {
-                (int) nextTeam
-                };
-            }
+            if (CurrentPlayerIndex >= 6)
+                CurrentPlayerIndex = 0;
             else
-            {
-                data = new object[]
-                {
-                (int) CurrentKTTeam
-                };
-            }
-            PhotonNetwork.RaiseEvent(29, data, raiseEventOptionsAll, sendOptions);
-        }
-        else
-        {
-            CurrentKTState = KTMultiplayerState.FINISH;
+                CurrentPlayerIndex++;
 
             data = new object[]
             {
-                (int) CurrentKTState,
+                CurrentPlayerIndex
             };
+
+            PhotonNetwork.RaiseEvent(29, data, raiseEventOptions, sendOptions);
+        }
+        else
+        {
+            //  FINISH MATCH NOW
+            CurrentKTState = KTMultiplayerState.FINISH;
+            data = new object[]
+            {
+                    (int) CurrentKTState,
+            };
+            PhotonNetwork.RaiseEvent(32, data, raiseEventOptions, sendOptions);
         }
     }
 
@@ -769,11 +846,27 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         PhotonNetwork.RaiseEvent(33, data, raiseEventOptionsAll, sendOptions);
 
         if (playerOneCurrentTimer == playerTwoCurrentTimer || playerTwoCurrentTimer == playerOneCurrentTimer)
+        {
+            playerData.Credits += 15;
             finishStatusTMP.text = "THE MATCH IS DRAW!";
+            earningStatusTMP.text = "YOU EARNED 15 COIN";
+        }
         else
-            finishStatusTMP.text = playerOneCurrentTimer > playerTwoCurrentTimer ? "YOU LOSE! THE ENEMY TEAM WINS!" : "YOU WIN!";
+        {
+            if (playerOneCurrentTimer > playerTwoCurrentTimer)
+            {
+                playerData.Credits += 25;
+                finishStatusTMP.text = "YOU LOSE! THE ENEMY TEAM WINS!";
+                earningStatusTMP.text = "YOU EARNED 25 COIN";
+            }
+            else
+            {
+                playerData.Credits += 50;
+                finishStatusTMP.text = "YOU WIN!";
+                earningStatusTMP.text = "YOU EARNED 50 COIN";
+            }
+        }
 
-        earningStatusTMP.text = "YOU EARNED 0 COIN";
 
         finishStatusObj.SetActive(true);
         pauseMenuObj.SetActive(false);
@@ -782,11 +875,11 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
     public void FinishPlayer()
     {
-        donePlayers[CurrentKTTeam] = true;
+        donePlayers[PhotonNetwork.LocalPlayer] = true;
 
         data = new object[]
         {
-            (int) CurrentKTTeam, true
+            PhotonNetwork.LocalPlayer, true
         };
 
         PhotonNetwork.RaiseEvent(31, data, raiseEventOptions, sendOptions);
@@ -818,16 +911,8 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
     private void ChangeVCamPlayer()
     {
-        if (TeamTurn == CurrentKTTeam)
-        {
-            vcamera.m_Follow = myPlayerObj.transform;
-            vcamera.m_LookAt = myPlayerObj.transform;
-        }
-        else
-        {
-            vcamera.m_Follow = enemyPlayerObj.transform;
-            vcamera.m_LookAt = enemyPlayerObj.transform;
-        }
+        vcamera.m_Follow = playerObjs.ElementAt(CurrentPlayerIndex).Value.transform;
+        vcamera.m_LookAt = playerObjs.ElementAt(CurrentPlayerIndex).Value.transform;
     }
 
     private void IndicatorEnabler()
@@ -839,10 +924,28 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
             return;
         }
 
-        if (TeamTurn == CurrentKTTeam)
+        if (playerObjs.ElementAt(currentTurnIndex).Value == myPlayerObj)
+        {
+            playerIndicatorTMP.text = "YOUR TURN\n YOU'RE PLAYER " + (currentTurnIndex + 1); 
             playerIndicator.SetActive(true);
+        }
         else
-            enemyIndicator.SetActive(true);
+        {
+            if (CurrentKTTeam == KTTeam.RED)
+            {
+                if (redTeamList.Contains(playerList.ElementAt(currentTurnIndex)))
+                    teamIndicator.SetActive(true);
+                else
+                    enemyIndicator.SetActive(true);
+            }
+            else
+            {
+                if (blueTeamList.Contains(playerList.ElementAt(currentTurnIndex)))
+                    teamIndicator.SetActive(true);
+                else
+                    enemyIndicator.SetActive(true);
+            }
+        }
     }
 
     private void GameplayUIEnabler()
@@ -852,9 +955,8 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
             gameplayUI.SetActive(false);
             return;
         }
-
         gameplayUI.SetActive(true);
-        jumpButtonObj.SetActive(TeamTurn == CurrentKTTeam ? true : false);
+        jumpButtonObj.SetActive(playerList[currentTurnIndex].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber ? true : false);
     }
 
     private void MoveGauge()
@@ -918,7 +1020,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     {
         if (CurrentKTState != KTMultiplayerState.GAME) return;
 
-        if (TeamTurn != CurrentKTTeam) return;
+        if (playerList[currentTurnIndex] != PhotonNetwork.LocalPlayer) return;
 
         if (holdJump) return;
 

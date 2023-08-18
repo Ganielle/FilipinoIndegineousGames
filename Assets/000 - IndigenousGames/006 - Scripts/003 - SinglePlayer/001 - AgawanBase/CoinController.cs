@@ -28,7 +28,7 @@ public class CoinController : MonoBehaviour
 
     public void AddCoin()
     {
-        core.CurrentCollectedCoin++;
+        core.CurrentCollectedCoin += 2;
         coinCollider.enabled = false;
         coinRenderer.enabled = false;
 

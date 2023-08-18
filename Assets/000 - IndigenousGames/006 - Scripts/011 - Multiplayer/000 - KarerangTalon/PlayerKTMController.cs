@@ -121,14 +121,14 @@ public class PlayerKTMController : MonoBehaviour
             return;
         }
 
-        if (core.TeamTurn != core.CurrentKTTeam)
-        {
-            playerRB.velocity = Vector3.zero;
-            playerAnimator.SetBool("run", false);
-            playerAnimator.SetBool("jump", false);
-            playerAnimator.SetBool("idle", true);
-            return;
-        }
+        //if (core.TeamTurn != core.CurrentKTTeam)
+        //{
+        //    playerRB.velocity = Vector3.zero;
+        //    playerAnimator.SetBool("run", false);
+        //    playerAnimator.SetBool("jump", false);
+        //    playerAnimator.SetBool("idle", true);
+        //    return;
+        //}
 
         if (core.CurrentKTState != KarerangTalonMultiplayerCore.KTMultiplayerState.GAME)
         {

@@ -2608,9 +2608,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 922207563}
-        m_TargetAssemblyTypeName: MainMenuCore, Assembly-CSharp
-        m_MethodName: SelfBug
+      - m_Target: {fileID: 922207562}
+        m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
+        m_MethodName: ComingSoon
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3020,8 +3020,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 922207562}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
-        m_MethodName: Multiplayer
-        m_Mode: 5
+        m_MethodName: ComingSoon
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -7670,9 +7670,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 922207563}
-        m_TargetAssemblyTypeName: MainMenuCore, Assembly-CSharp
-        m_MethodName: SelfBug
+      - m_Target: {fileID: 922207562}
+        m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
+        m_MethodName: ComingSoon
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8321,8 +8321,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 922207562}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
-        m_MethodName: Multiplayer
-        m_Mode: 5
+        m_MethodName: ComingSoon
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -9371,6 +9371,27 @@ MonoBehaviour:
   charItemShop: {fileID: 67224302975298891, guid: e3a071845a99fca468dcb305d9b49692, type: 3}
   triviaItemShop: {fileID: 3365945719838942227, guid: 1415ca6f247cf684e8859efc2c76d4d8, type: 3}
   creditsTMP: {fileID: 919692173}
+  triviaBGList:
+  - {fileID: 21300000, guid: aac63e74719bb0e4c99da7ab1e45c425, type: 3}
+  - {fileID: 21300000, guid: 02ac016fc5b818347a0be0ad8a9691f8, type: 3}
+  - {fileID: 21300000, guid: 676d585639e2b6945af89a73519d0f88, type: 3}
+  - {fileID: 21300000, guid: 57ac0c242a3b56448a639aaf3f62a095, type: 3}
+  - {fileID: 21300000, guid: d30ffbaf353e54f42aabd34accf611c0, type: 3}
+  - {fileID: 21300000, guid: ab9481c812f790240af1e80937bcd695, type: 3}
+  - {fileID: 21300000, guid: 5a2afcd0d3d417446a8ad4d25d61e164, type: 3}
+  - {fileID: 21300000, guid: 134811b16bba404448e69ffe9f0b4c60, type: 3}
+  - {fileID: 21300000, guid: 1aeb571ac9d7e7342954cea2b23576ae, type: 3}
+  - {fileID: 21300000, guid: 4d17a4b66ad25414188baf4978d5b51b, type: 3}
+  - {fileID: 21300000, guid: 562c54f7fca01e242a5841dab32f906f, type: 3}
+  - {fileID: 21300000, guid: 290ea1a8a42c0af40ad34e98936ca5dd, type: 3}
+  - {fileID: 21300000, guid: 0e1eb2e395fa79045a3ff4c634ebbea0, type: 3}
+  - {fileID: 21300000, guid: 3d95f081807e1654f84387e88049881a, type: 3}
+  - {fileID: 21300000, guid: cccb4cb44ce770d4cb307ecbea0eafbc, type: 3}
+  - {fileID: 21300000, guid: d08196a232743564c8e93a0f333fee3e, type: 3}
+  - {fileID: 21300000, guid: f2a20a23f806be347a78ff40e2dda727, type: 3}
+  - {fileID: 21300000, guid: a83b2ab9f3797b94f94083e05eab1c79, type: 3}
+  - {fileID: 21300000, guid: c09fa56652f6be1438dbb259b4a97953, type: 3}
+  - {fileID: 21300000, guid: e6ee8a2ee8062764ea76f5a0e5b4c1ec, type: 3}
   charDataList:
   - {fileID: 11400000, guid: 4537b0f9f5aac324b9dab70d8147c5eb, type: 2}
   - {fileID: 11400000, guid: 74ec1ea36468f3541a7f77c016482062, type: 2}
@@ -16846,8 +16867,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 922207562}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
-        m_MethodName: Multiplayer
-        m_Mode: 5
+        m_MethodName: ComingSoon
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -24172,9 +24193,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 922207563}
-        m_TargetAssemblyTypeName: MainMenuCore, Assembly-CSharp
-        m_MethodName: SelfBug
+      - m_Target: {fileID: 922207562}
+        m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
+        m_MethodName: ComingSoon
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

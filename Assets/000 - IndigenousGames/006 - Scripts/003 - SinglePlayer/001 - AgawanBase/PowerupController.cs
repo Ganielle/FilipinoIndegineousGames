@@ -121,7 +121,13 @@ public class PowerupController : MonoBehaviour
         }
         else if (selectedIndex == 2)
         {
-            StartCoroutine(playerMovement.SpeedBoost());
+            core.CurrentCollectedCoin += 5;
+            core.ChangeCurrentCoin();
+        }
+        else
+        {
+            core.CurrentCollectedCoin += 15;
+            core.ChangeCurrentCoin();
         }
 
         yield return new WaitForSecondsRealtime(1f);

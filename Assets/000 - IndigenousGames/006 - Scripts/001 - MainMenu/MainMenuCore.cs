@@ -118,6 +118,7 @@ public class MainMenuCore : MonoBehaviour
     [SerializeField] private GameObject charItemShop;
     [SerializeField] private GameObject triviaItemShop;
     [SerializeField] private TextMeshProUGUI creditsTMP;
+    [SerializeField] private List<Sprite> triviaBGList;
     [SerializeField] private List<ShopCharData> charDataList;
     [SerializeField] private List<TriviaData> triviaDataList;
 
@@ -303,6 +304,7 @@ public class MainMenuCore : MonoBehaviour
             GameObject obj = Instantiate(triviaItemShop, triviaContentTF);
 
             obj.GetComponent<TriviaController>().triviaData = triviaDataList[a];
+            obj.GetComponent<TriviaController>().SetBG(triviaBGList[a]);
             obj.GetComponent<TriviaController>().CheckIfUnlocked();
 
             yield return null;

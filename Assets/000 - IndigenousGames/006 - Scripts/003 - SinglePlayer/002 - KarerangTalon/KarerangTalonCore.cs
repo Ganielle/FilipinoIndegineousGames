@@ -282,9 +282,26 @@ public class KarerangTalonCore : MonoBehaviour
             CurrentGameStateKT = GameStateKT.FINISH;
 
             if (playerTime == enemyTime || enemyTime == playerTime)
+            {
+                playerData.Credits += 50;
                 finishStatusTMP.text = "THE MATCH IS DRAW!";
+            }
             else
-                finishStatusTMP.text = playerTime < enemyTime ? "BLUE TEAM WINS!" : "RED TEAM WINS!";
+            {
+                if (playerTime < enemyTime)
+                {
+                    playerData.Credits += 25;
+                    finishStatusTMP.text = "BLUE TEAM WINS";
+                    earningStatusTMP.text = "YOU EARNED 25 COIN";
+                }
+                else
+                {
+                    playerData.Credits += 50;
+                    finishStatusTMP.text = "RED TEAM WINS";
+                    earningStatusTMP.text = "YOU EARNED 50 COIN";
+                }
+            }
+
 
             earningStatusTMP.text = "YOU EARNED 0 COIN";
 

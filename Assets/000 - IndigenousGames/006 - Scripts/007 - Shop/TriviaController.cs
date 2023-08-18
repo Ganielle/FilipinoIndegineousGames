@@ -8,11 +8,14 @@ using UnityEngine.UI;
 public class TriviaController : MonoBehaviour
 {
     [SerializeField] private PlayeData playerData;
+    [SerializeField] private Image bgImg;
     [SerializeField] private TextMeshProUGUI title;
     [SerializeField] private Button buyBtn;
 
     [Header("DEBUGGER")]
     [ReadOnly] public TriviaData triviaData;
+
+    public void SetBG(Sprite value) => bgImg.sprite = value;
 
     public void CheckIfUnlocked()
     {
