@@ -786,11 +786,18 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
             }
             else
             {
-                findPlayer = true;
                 CurrentPlayerIndex = tempIndex;
+                findPlayer = true;
             }
             yield return null;
         }
+
+        for (int a = 0; a < playerItemTeam.Count; a++)
+        {
+            playerItemTeam[a].interactable = false;
+        }
+
+        playerItemTeam[CurrentPlayerIndex].interactable = true;
 
         data = new object[]
         {
@@ -894,10 +901,10 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
     private void KTStateEvents(object sender, EventArgs e)
     {
+        EnablePlayerObject();
         IndicatorEnabler();
         GameplayUIEnabler();
         ActivateTimer();
-        EnablePlayerObject();
         ActivateGameplayTimer();
         SetWinner();
     }
@@ -906,6 +913,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     {
         ChangeVCamPlayer();
         CheckIfDoneRound();
+        EnablePlayerObject();
     }
 
     #region GAMEPLAY
