@@ -13,6 +13,7 @@ public class TriviaController : MonoBehaviour
     [SerializeField] private Button buyBtn;
 
     [Header("DEBUGGER")]
+    [ReadOnly] public MainMenuCore core;
     [ReadOnly] public TriviaData triviaData;
 
     public void SetBG(Sprite value) => bgImg.sprite = value;
@@ -37,8 +38,10 @@ public class TriviaController : MonoBehaviour
                 return;
             }
 
+            playerData.Credits -= triviaData.price;
             playerData.UnlockTrivia(triviaData.itemID);
             CheckIfUnlocked();
+            core.RefreshShopCredits();
         }, null);
     }
 }

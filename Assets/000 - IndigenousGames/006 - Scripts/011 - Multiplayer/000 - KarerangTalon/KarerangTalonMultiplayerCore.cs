@@ -256,21 +256,13 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         {
             object[] dataState = (object[])obj.CustomData;
 
-            playerObjs[(Player)dataState[1]].SetActive((bool)dataState[0]);
-
-            if (playerObjs.Count >= 6)
+            for (int a = 0; a < playerObjs.Count; a++)
             {
-                if (CurrentPlayerIndex <= 0)
-                {
-                    if (playerObjs.ElementAt(5).Value != null)
-                        playerObjs.ElementAt(5).Value.SetActive(false);
-                }
-                else
-                {
-                    if (playerObjs.ElementAt(CurrentPlayerIndex - 1).Value != null)
-                        playerObjs.ElementAt(CurrentPlayerIndex - 1).Value.SetActive(false);
-                }
+                if (playerObjs.ElementAt(0).Value != null)
+                    playerObjs.ElementAt(a).Value.SetActive(false);
             }
+
+            playerObjs[(Player)dataState[1]].SetActive((bool)dataState[0]);
         }
 
         //  CHANGE KT STATE
@@ -531,7 +523,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
     IEnumerator CheckAllPlayerIfReadyHost()
     {
-        while (playerObjs.Count < 6) yield return null;
+        while (playerObjs.ContainsValue(null)) yield return null;
 
         ChangeVCamPlayer();
 
@@ -607,7 +599,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
     IEnumerator CheckAllPlayerReadyPlayer()
     {
-        while (playerObjs.Count < 6) yield return null;
+        while (playerObjs.ContainsValue(null)) yield return null;
 
         readyPlayers[PhotonNetwork.LocalPlayer] = true;
         donePlayers[PhotonNetwork.LocalPlayer] = false;
@@ -736,29 +728,13 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
     {
         if (CurrentKTState != KTMultiplayerState.COUNTDOWN) return;
 
-        if (playerList.ElementAt(CurrentPlayerIndex) == PhotonNetwork.LocalPlayer)
-            playerObjs[PhotonNetwork.LocalPlayer].SetActive(true);
-        else
-            playerObjs.ElementAt(CurrentPlayerIndex).Value.SetActive(true);
-
-        if (CurrentPlayerIndex <= 0)
-            playerObjs.ElementAt(5).Value.SetActive(false);
-        else
-            playerObjs.ElementAt(CurrentPlayerIndex - 1).Value.SetActive(false);
-
-        if (playerObjs.Count >= 6)
+        for (int a = 0; a < playerObjs.Count; a++)
         {
-            if (CurrentPlayerIndex <= 0)
-            {
-                if (playerObjs.ElementAt(5).Value != null)
-                    playerObjs.ElementAt(5).Value.SetActive(false);
-            }
-            else
-            {
-                if (playerObjs.ElementAt(CurrentPlayerIndex - 1).Value != null)
-                    playerObjs.ElementAt(CurrentPlayerIndex - 1).Value.SetActive(false);
-            }
+            if (playerObjs.ElementAt(a).Value != null)
+                playerObjs.ElementAt(a).Value.SetActive(false);
         }
+
+        playerObjs.ElementAt(CurrentPlayerIndex).Value.SetActive(true);
 
         data = new object[]
         {
@@ -789,6 +765,41 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
         StartCoroutine(ChangeToTimer(0f));
     }
 
+    IEnumerator FindPlayerNextTurn()
+    {
+        if (CurrentPlayerIndex >= 5)
+            CurrentPlayerIndex = 0;
+        else
+            CurrentPlayerIndex++;
+
+        bool findPlayer = false;
+        int tempIndex = CurrentPlayerIndex;
+
+        while (!findPlayer)
+        {
+            if (donePlayers.ElementAt(tempIndex).Value)
+            {
+                if (tempIndex >= 5)
+                    tempIndex = 0;
+
+                tempIndex++;
+            }
+            else
+            {
+                findPlayer = true;
+                CurrentPlayerIndex = tempIndex;
+            }
+            yield return null;
+        }
+
+        data = new object[]
+        {
+                CurrentPlayerIndex
+        };
+
+        PhotonNetwork.RaiseEvent(29, data, raiseEventOptions, sendOptions);
+    }
+
     public void TellServerToNextPlayer()
     {
         currentStage = 1;
@@ -797,17 +808,7 @@ public class KarerangTalonMultiplayerCore : MonoBehaviourPunCallbacks
 
         if (donePlayers.ContainsValue(false))
         {
-            if (CurrentPlayerIndex >= 6)
-                CurrentPlayerIndex = 0;
-            else
-                CurrentPlayerIndex++;
-
-            data = new object[]
-            {
-                CurrentPlayerIndex
-            };
-
-            PhotonNetwork.RaiseEvent(29, data, raiseEventOptions, sendOptions);
+            StartCoroutine(FindPlayerNextTurn());
         }
         else
         {

@@ -290,6 +290,7 @@ public class MainMenuCore : MonoBehaviour
         {
             GameObject obj = Instantiate(charItemShop, characterContentTF);
 
+            obj.GetComponent<ShopCharController>().core = this;
             obj.GetComponent<ShopCharController>().shopCharData = charDataList[a];
             obj.GetComponent<ShopCharController>().playerData = playerData;
             obj.GetComponent<ShopCharController>().SetData(() => creditsTMP.text = playerData.Credits.ToString("n0"));
@@ -303,6 +304,7 @@ public class MainMenuCore : MonoBehaviour
         {
             GameObject obj = Instantiate(triviaItemShop, triviaContentTF);
 
+            obj.GetComponent<TriviaController>().core = this;
             obj.GetComponent<TriviaController>().triviaData = triviaDataList[a];
             obj.GetComponent<TriviaController>().SetBG(triviaBGList[a]);
             obj.GetComponent<TriviaController>().CheckIfUnlocked();
@@ -310,6 +312,8 @@ public class MainMenuCore : MonoBehaviour
             yield return null;
         }
     }
+
+    public void RefreshShopCredits() => creditsTMP.text = playerData.Credits.ToString("n0");
 
     private IEnumerator PopulateJournal()
     {

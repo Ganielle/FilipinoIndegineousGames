@@ -13,6 +13,7 @@ public class ShopCharController : MonoBehaviour
     [SerializeField] private Button equipBtn;
 
     [Header("DEBUGGER")]
+    [ReadOnly] public MainMenuCore core;
     [ReadOnly] public ShopCharData shopCharData;
     [ReadOnly] public PlayeData playerData;
     [ReadOnly] public bool isUnlocked;
@@ -93,9 +94,9 @@ public class ShopCharController : MonoBehaviour
                     return;
                 }
                 playerData.Credits -= shopCharData.price;
-
                 playerData.UnlockCharacter(shopCharData.characterID);
                 CheckIfUnlocked();
+                core.RefreshShopCredits();
 
                 if (afterPurchase != null)
                     afterPurchase();
