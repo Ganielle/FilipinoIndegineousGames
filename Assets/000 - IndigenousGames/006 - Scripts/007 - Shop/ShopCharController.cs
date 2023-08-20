@@ -2,6 +2,7 @@ using MyBox;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,7 @@ public class ShopCharController : MonoBehaviour
     [SerializeField] private GameObject buyBtnObj;
     [SerializeField] private GameObject equipBtnObj;
     [SerializeField] private Button equipBtn;
+    [SerializeField] private TextMeshProUGUI titleTMP;
 
     [Header("DEBUGGER")]
     [ReadOnly] public MainMenuCore core;
@@ -40,8 +42,10 @@ public class ShopCharController : MonoBehaviour
         CheckIfEquip();
     }
 
-    public void SetData(Action afterPurchase)
+    public void SetData(Action afterPurchase, string characterTitle)
     {
+        titleTMP.text = characterTitle;
+
         if (afterPurchase != null) this.afterPurchase = afterPurchase;
 
         CheckIfUnlocked();

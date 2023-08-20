@@ -36,6 +36,15 @@ public class ABPlayerMovement : MonoBehaviour
             else
                 core.AddRedTeamScore();
 
+            if (gatekeeperEnemyName == "RedGatekeeper")
+            {
+                core.taggedBlueList.Remove(gameObject);
+            }
+            else
+            {
+                core.taggedBlueList.Remove(gameObject);
+            }
+
             core.BrinPlayerToSpawnPoint();
         }
 
@@ -87,14 +96,14 @@ public class ABPlayerMovement : MonoBehaviour
 
             //core.BrinPlayerToSpawnPoint();
 
-            if (gatekeeperEnemyName == "RedGatekeeper")
-            {
-                redKeeperBoundry.AddPlayerInBoundary(transform);
-            }
-            else
-            {
-                blueKeeperBoundry.AddPlayerInBoundary(transform);
-            }
+            //if (gatekeeperEnemyName == "RedGatekeeper")
+            //{
+            //    redKeeperBoundry.AddPlayerInBoundary(transform);
+            //}
+            //else
+            //{
+            //    blueKeeperBoundry.AddPlayerInBoundary(transform);
+            //}
         }
     }
 

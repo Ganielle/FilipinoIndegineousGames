@@ -293,7 +293,7 @@ public class MainMenuCore : MonoBehaviour
             obj.GetComponent<ShopCharController>().core = this;
             obj.GetComponent<ShopCharController>().shopCharData = charDataList[a];
             obj.GetComponent<ShopCharController>().playerData = playerData;
-            obj.GetComponent<ShopCharController>().SetData(() => creditsTMP.text = playerData.Credits.ToString("n0"));
+            obj.GetComponent<ShopCharController>().SetData(() => creditsTMP.text = playerData.Credits.ToString("n0"), "CHARACTER " + (a + 1));
             yield return null;
         }
     }
